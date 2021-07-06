@@ -1,9 +1,139 @@
+<!DOCTYPE html>
 <html>
 <head>
+<title>Finesse.io</title>
+<meta charset="UTF-8">
+<link rel="stylesheet" type="text/css" href="css/base.css">
+<link rel="shortcut icon" href="resources/img/favicon.ico" sizes="16x16" type="image/x-icon">
 </head>
 <body>
-	<h1>
-		Hello World!
-	</h1>
+ <canvas id="canvas"></canvas>
+ <br>
+ <div style="width:10;height:10;overflow-y:scroll">
+    <table>
+        <caption>Game Controls</caption>
+        <thead>
+            <tr>
+                <th>Action</th>
+                <th>Key</th>
+                <th colspan="3">Button</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>Hard Drop</td>
+                <td>[Up Arrow]</td>
+                <td colspan="3">[D-pad Up]</td>
+            </tr>
+            <tr>
+                <td>Soft Drop</td>
+                <td>[Down Arrow]</td>
+                <td colspan="3">[D-pad Down]</td>
+            </tr>
+            <tr>
+                <td>Left</td>
+                <td>[Left Arrow]</td>
+                <td colspan="3">[D-pad Left]</td>
+            </tr>
+            <tr>
+                <td>Right</td>
+                <td>[Right Arrow]</td>
+                <td colspan="3">[D-pad Right]</td>
+            </tr>
+            <tr>
+                <td>Clockwise Rotation</td>
+                <td>[X]</td>
+                <td>Circle</td>
+                <td>B</td>
+                <td>1</td>
+            </tr>
+            <tr>
+                <td>Counterclockwise Rotation</td>
+                <td>[Z]</td>
+                <td>Cross</td>
+                <td>A</td>
+                <td>0</td>
+            </tr>
+            <tr>
+                <td>Hold</td>
+                <td>[C]</td>
+                <td>R1</td>
+                <td>RB</td>
+                <td>5</td>
+            </tr>
+            <tr>
+                <td>Change Game Mode</td>
+                <td>[/]</td>
+                <td colspan="3">&nbsp;</td>
+            </tr>
+            <tr>
+                <td>Hide/Show Ghost</td>
+                <td>[-]</td>
+                <td colspan="3">&nbsp;</td>
+            </tr>
+            <tr>
+                <td>Export Settings</td>
+                <td>[*]</td>
+                <td colspan="3">&nbsp;</td>
+            </tr>
+        </tbody>
+        <tfoot>
+            <tr>
+                <td>&nbsp;</td>
+                <td>&nbsp;</td>
+                <td>PS</td>
+                <td>XBox</td>
+                <td>Generic</td>
+            </tr>
+        </tfoot>
+    </table>
+    <br>
+    To rebind your controls, first export the settings by pressing [*]. Then update the json file (the values in the "keybinds" section). When you're done, save the file and drag & drop it into this page.
+    <br>
+    Click anywhere in the game screen to reset your current progress.
+    <br>
+    To modify any of the settings of the game, first export the settings by pressing [*] on your keyboard.
+    <br>
+    Open up the downloaded file on your text editor of choice, and set the values as you see fit.
+    <br>
+    Once you're done modifying the settings file, save it, then drag and drop it into this page, the settings will be imported automatically.
+    <br>
+    * Note that this program doesn't store any files in your system so every time you reload this page, you may need to re-import your settings.
+    <br>
+
+    <table>
+        <caption>GLOSSARY</caption>
+        <thead>
+            <tr>
+                <td>Term</td>
+                <td>Definition</td>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>DAS</td>
+                <td>Delayed Auto-Shift: DAS refers to the delay before the Auto-Shifting occurs.</td>
+            </tr>
+            <tr>
+                <td>ARR</td>
+                <td>Auto Repeat Rate: refers to the rate at which shifting automatically occurs.<br>If the value is -1, the piece will move against the wall immediately after shifting is triggered.<br>A change in direction will cause this to be reset.</td>
+            </tr>
+            <tr>
+                <td>SDR</td>
+                <td>Soft-Drop Rate: refers to the rate at which the piece moves down ONCE. <br>If the SDR value is set to 0, the piece will move down every frame; if the value is set to -1 it will move instantly to the bottom.</td>
+            </tr>
+        </tbody>
+    </table>
+
+    All the finesse moves are based on the <a href='https://harddrop.com/wiki/0G_60_Hz_SRS_Movement_Finesse'>0G 60Hz SRS Finesse</a> listed on the harddrop wiki.
+
+</div>
+
+<script src="scripts/grids/library.js" ></script>
+<script src="scripts/util/math.js" ></script>
+<script src="scripts/util/moves.js" ></script>
+<script src="scripts/grids/minos.js" ></script>
+<script src="scripts/object/shape.js" ></script>
+<script src="scripts/main.js" ></script>
 </body>
 </html>
