@@ -101,9 +101,9 @@ var gameMode = 0;
         var dim = 640;
         var nRows = 40;
         var nCols = 12;
-        var blockSize = 30;
-        var topMargin = -610;
-        var leftMargin = 125;
+        var blockSize = 25;
+        var topMargin = -415;
+        var leftMargin = 150;
         var scoreX = 10;
         var scoreY = 200;
         var settingsX = 470;
@@ -115,7 +115,7 @@ var gameMode = 0;
         var previewCenterX = 550;
         var previewCenterY = 97;
         
-        var bagCenterX = 440;
+        var bagCenterX = 410;
         var bagCenterY = 125;
         
         var holdCenterX = 46;
@@ -131,7 +131,7 @@ var gameMode = 0;
         var mainFont = 'bold 48px monospace';
         var smallFont = 'bold 18px monospace';
         var colors = ['#FF0000', '#00FF00', 'cyan', 'purple', 'yellow', 'orange', 'blue', 'black'];
-        var gridRect = { x: 150, y: 47, w: 308, h: 517 };
+        var gridRect = { x: 172, y: 57, w: 256, h: 507 };
         var holdRect = { x: 30, y: 47, w: 100, h: 100 };
         var previewRect = { x: 490, y: 47, w: 120, h: 350 };
         var titleRect = { x: 100, y: 95, w: 320, h: 100 };
@@ -151,7 +151,7 @@ var gameMode = 0;
         var fallingShapeRow;
         var fallingShapeCol;
         var STARTING_COL = 4;
-        var STARTING_ROW = 20;
+        var STARTING_ROW = 16;
         
         // position of the ghost
         var ghostRow;
@@ -942,7 +942,10 @@ var playerArrSetting;
                     if (idx > EMPTY && showBoard)
                         drawSquare(colors.length - 1, r, c);
                     else if (idx != BORDER)
+                    {
+                        if (r < 19) continue;
                         drawGridSquare(r, c);
+                    }
                 }
             }
  
