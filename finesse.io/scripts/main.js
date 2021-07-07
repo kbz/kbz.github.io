@@ -1,14 +1,5 @@
 'use strict';
 
-// 0: all
-// 1: Z
-// 2: S
-// 3: I
-// 4: T
-// 5: O
-// 6: L
-// 7: J
-// 8: normal
 const KEY_DROP = 'FAST_DROP';
 const KEY_LEFT = 'LEFT';
 const KEY_RIGHT = 'RIGHT';
@@ -37,18 +28,18 @@ var defaultKeyboardBindings = [
     ['arrowdown', KEY_DOWN],
     ['arrowleft', KEY_LEFT],
     ['arrowright', KEY_RIGHT],
-    ['x', KEY_CLOCK],
-    ['z', KEY_COUNTERCLOCK],
-    ['c', KEY_HOLD]
+    ['keyx', KEY_CLOCK],
+    ['keyz', KEY_COUNTERCLOCK],
+    ['keyc', KEY_HOLD]
 ];
 var keyboardBindings = [
     ['arrowup', KEY_DROP],
     ['arrowdown', KEY_DOWN],
     ['arrowleft', KEY_LEFT],
     ['arrowright', KEY_RIGHT],
-    ['x', KEY_CLOCK],
-    ['z', KEY_COUNTERCLOCK],
-    ['c', KEY_HOLD]
+    ['keyx', KEY_CLOCK],
+    ['keyz', KEY_COUNTERCLOCK],
+    ['keyc', KEY_HOLD]
 ];
 var defaultControllerBindings = [
     [12, KEY_DROP],
@@ -79,6 +70,9 @@ var gameMode = 0;
         canvas.height = 640;
         var activeGamepad;
         
+        var   showBoard = true;
+        var   showInputs = false;
+        var   pressedKeys = [];
         var   ARR_VALUE = 1;
         var   SDR_VALUE = 1;
         var   DAS_VALUE = 12;
@@ -86,6 +80,8 @@ var gameMode = 0;
         const MESSAGE_DURATION = 120;
         var isLeftDas = false;
         var isRightDas = false;
+        const FPS = 60;
+        const fpsInterval = 1000/ FPS;
         
         var g = canvas.getContext('2d');
  
@@ -208,30 +204,53 @@ var gameMode = 0;
         });
  
         addEventListener('keyup', function (event) {
-            var code = event.key.toString().toLowerCase();
+            var code = event.code.toString().toLowerCase();
             keyStateArray[code] = false;
         });
         
+var playerArrSetting;
+
         addEventListener('keydown', function (event) {
-            var code = event.key.toString().toLowerCase();
+            var code = event.code.toString().toLowerCase();
             // prevent from down/up/space causing in-page navigation while playing...
-            event.preventDefault();
-            if (code === "*")
+            if (code !== "f12" && code !== "f5")
+            {
+                event.preventDefault();
+            }
+            if (code === "numpadmultiply")
             {
                 exportSettings();
                 return;
             }
-            if (code === "-")
+            if (code === "numpadsubstract")
             {
                 showGhost = !showGhost;
                 return;
             }
-            if (code === "/")
+            if (code === "numpadadd")
+            {
+                showBoard = !showBoard;
+                return;
+            }
+            if (code === "f1")
+            {
+                showInputs = !showInputs;
+                return;
+            }
+            if (code === "numpaddivide")
             {
                 
                 gameMode++;
+                if (gameMode === GAME_MODE_9)
+                {
+                    playerArrSetting = ARR_VALUE;
+                    ARR_VALUE = 0;
+                }
                 if (gameMode > GAME_MODE_9)
+                {
+                    ARR_VALUE = playerArrSetting;
                     gameMode = GAME_MODE_0;
+                }
                 
                 initBags();
                 selectShape();
@@ -374,7 +393,6 @@ var gameMode = 0;
             lockDelay --;
             if (lockDelay <= 0)
             {
-                
                 lockDelay = DEF_LOCK_DELAY;
                 if (gameMode < 8)
                 {               
@@ -447,7 +465,7 @@ var gameMode = 0;
         {
             lockDelay = DEF_LOCK_DELAY;
             if (gameMode < 8)
-            {               
+            {
                 if (compareMoves(moveList, targetMoves))
                 {
                     scoreboard.addScore(1);
@@ -482,7 +500,6 @@ var gameMode = 0;
                         for (var i = 0; i < moves.length; i++)
                         {
                             message += moves[i] + "\n";
-                            console.log(moves[i]);
                         }
                         messages.push(message);
                         scoreboard.comboBroke();
@@ -921,7 +938,7 @@ var gameMode = 0;
             for (var r = 0; r < nRows; r++) {
                 for (var c = 0; c < nCols; c++) {
                     var idx = grid[r][c];
-                    if (idx > EMPTY)
+                    if (idx > EMPTY && showBoard)
                         drawSquare(colors.length - 1, r, c);
                     else if (idx != BORDER)
                         drawGridSquare(r, c);
@@ -987,6 +1004,18 @@ var gameMode = 0;
                 g.fillText(scoreboard.getCorrect(), scoreX, scoreY + 165);
                 g.fillText('finesse (%): ', scoreX, scoreY + 180);
                 g.fillText(Math.floor((100*scoreboard.getCorrect() / scoreboard.getTotal())), scoreX, scoreY + 195);
+            }
+            if (showInputs)
+            {
+                var offset = 15;
+                g.fillText('Inputs:', scoreX, scoreY + 195 + offset);
+                offset += 15;
+                for (var i = 0; i < pressedKeys.length; i++)
+                {
+                    var input = pressedKeys[i];
+                    g.fillText(input, scoreX, scoreY + 195 + offset);
+                    offset += 15;
+                }
             }
             g.fillText( scoreboard.getTotal(), scoreX, scoreY + 135);
 
@@ -1056,100 +1085,112 @@ var gameMode = 0;
         }
 var previousButtonStates = [];
 var demoButtonPressed = false;
+var now;
+var elapsed;
+var then = Date.now();
 function loop(timestamp) {
-  
-  // game mode 9: demo/auto mode this breaks if ARR is set to 0
-    if (gameMode === GAME_MODE_9)
+ 
+    requestAnimationFrame(loop);
+    
+    now = Date.now();
+    elapsed = now - then;
+    if (elapsed > fpsInterval)
     {
-        if (targetMoves.length !== 0)
+        
+        then = now - (elapsed % fpsInterval);
+  // game mode 9: demo/auto mode this breaks if ARR is set to 0
+        if (gameMode === GAME_MODE_9)
         {
-            if (demoDelay === 0)
+            if (targetMoves.length !== 0)
             {
-              var cm = targetMoves[0][currentMove];
-              switch (cm)
-              {
-                  case DAS_RIGHT:
-                      if (!demoButtonPressed)
-                      {
-                          keydown(KEY_RIGHT);
-                          demoButtonPressed = true;
-                      }
-                      else 
-                      {
-                          if (isRightDas)
-                          {
-                              keyup(KEY_RIGHT);
-                              demoButtonPressed = false;
-                              currentMove++;
-                              demoDelay = DEMO_DELAY;
-                          }
-                      }
-                      break;
-                  case RIGHT:
-                      if (!demoButtonPressed)
-                      {
-                          keydown(KEY_RIGHT);
-                          demoButtonPressed = true;
-                      } else
-                      {
-                          keyup(KEY_RIGHT);
-                          demoButtonPressed = false;
-                          currentMove++;
-              demoDelay = DEMO_DELAY;
-                      }
-                      break;
-                  case LEFT:
-                      if (!demoButtonPressed)
-                      {
-                          keydown(KEY_LEFT);
-                          demoButtonPressed = true;
-                      }
-                      else
-                      {
-                          keyup(KEY_LEFT);
-                          demoButtonPressed = false;
-                          currentMove++;
-              demoDelay = DEMO_DELAY;
-                      }
-                      break;
-                  case DAS_LEFT:
-                      if (!demoButtonPressed)
-                      {
-                          keydown(KEY_LEFT);
-                          demoButtonPressed = true;
-                      }
-                      else
-                      {
-                          if (isLeftDas)
-                          {
-                              keyup(KEY_LEFT);
-                              demoButtonPressed = false;
-                              currentMove++;
-              demoDelay = DEMO_DELAY;
-                          }
-                      }
-                      break;
-                  case DROP:
-                      while(canMove(fallingShape, down))
-                          move(down);
-                          moveList.push(DROP);
+                if (demoDelay === 0)
+                {
+                    var cm = targetMoves[0][currentMove];
+                    switch (cm)
+                    {
+                    case DAS_RIGHT:
+                        if (!demoButtonPressed)
+                        {
+                            keydown(KEY_RIGHT);
+                            demoButtonPressed = true;
+                        }
+                        else 
+                        {
+                            if (isRightDas)
+                            {
+                                keyup(KEY_RIGHT);
+                                demoButtonPressed = false;
+                                currentMove++;
+                                demoDelay = DEMO_DELAY;
+                            }
+                        }
+                        break;
+                    case RIGHT:
+                        if (!demoButtonPressed)
+                        {
+                            keydown(KEY_RIGHT);
+                            demoButtonPressed = true;
+                        } else
+                        {
+                            keyup(KEY_RIGHT);
+                            demoButtonPressed = false;
+                            currentMove++;
+                            demoDelay = DEMO_DELAY;
+                        }
+                        break;
+                    case LEFT:
+                        if (!demoButtonPressed)
+                        {
+                            keydown(KEY_LEFT);
+                            demoButtonPressed = true;
+                        }
+                        else
+                        {
+                            keyup(KEY_LEFT);
+                            demoButtonPressed = false;
+                            currentMove++;
+                            demoDelay = DEMO_DELAY;
+                        }
+                        break;
+                    case DAS_LEFT:
+                        if (!demoButtonPressed)
+                        {
+                            keydown(KEY_LEFT);
+                            demoButtonPressed = true;
+                        }
+                        else
+                        {
+                            if (isLeftDas)
+                            {
+                                keyup(KEY_LEFT);
+                                demoButtonPressed = false;
+                                currentMove++;
+                                demoDelay = DEMO_DELAY;
+                            }
+                        }
+                        break;
+                    case DROP:
+                        while(canMove(fallingShape, down))
+                        {
+                            move(down);
+                        }
+                        moveList.push(DROP);
                         shapeHasLanded(true);
-                      break;
-                  case ROTATE_CLOCK:
-                      if (!demoButtonPressed)
-                      {
-                          keydown(KEY_CLOCK);
-                          demoButtonPressed = true;
-                      }
-                      else
-                      {
-                          keyup(KEY_CLOCK);
-                          currentMove++;
-                          demoButtonPressed = false;
-              demoDelay = DEMO_DELAY;
-
-                      }
-                      break;
+                        break;
+                    case ROTATE_CLOCK:
+                        if (!demoButtonPressed)
+                        {
+                            keydown(KEY_CLOCK);
+                            demoButtonPressed = true;
+                        }
+                        else
+                        {
+                            keyup(KEY_CLOCK);
+                            currentMove++;
+                            demoButtonPressed = false;
+                            demoDelay = DEMO_DELAY;
+                        }
+                    break;
                   case ROTATE_COUNTER:
                       if (!demoButtonPressed)
                       {
@@ -1161,77 +1202,81 @@ function loop(timestamp) {
                           keyup(KEY_COUNTERCLOCK);
                           currentMove++;
                           demoButtonPressed = false;
-              demoDelay = DEMO_DELAY;
+                          demoDelay = DEMO_DELAY;
                       }
                       break;
-
-
+                  }
+              }
+              else 
+              {
+                  demoDelay--;
               }
           }
-          else 
-          {
-              demoDelay--;
-          }
-      }
-    }
-    // handle inputs
-    // NOTE: Inputs are parsed into actions to be performed
-    // And will be processed exactly once per frame.
-    // If keyboard and controller perform an input, they'll be performed exactly once.
-    // If both keyboard and controller perform the same input, it'll be performed only once.
-    
-    // handle gamepad inputs
-    if(navigator.getGamepads()) {
-        var gp = navigator.getGamepads()[0];
-        if (gp !== undefined && gp !== null)
-        {
-            for (var b = 0; b < gp.buttons.length; b++)
+        }
+        // handle inputs
+        // NOTE: Inputs are parsed into actions to be performed
+        // And will be processed exactly once per frame.
+        // If keyboard and controller perform an input, they'll be performed exactly once.
+        // If both keyboard and controller perform the same input, it'll be performed only once.
+
+        // handle gamepad inputs
+        if(navigator.getGamepads()) {
+            var gp = navigator.getGamepads()[0];
+            if (gp !== undefined && gp !== null)
             {
-                if (previousButtonStates[b] === undefined)
+                for (var b = 0; b < gp.buttons.length; b++)
                 {
-                    previousButtonStates[b] = false;
+                    if (previousButtonStates[b] === undefined)
+                    {
+                        previousButtonStates[b] = false;
+                    }
+                    readInput(b, gp.buttons[b].pressed, previousButtonStates[b]);
+                    previousButtonStates[b] = gp.buttons[b].pressed;
                 }
-                readInput(b, gp.buttons[b].pressed, previousButtonStates[b]);
-                previousButtonStates[b] = gp.buttons[b].pressed;
             }
         }
-    }
-  
-    // handle keyboard inputs
-    for (const key of Object.keys(keyStateArray))
-    {
-        if (keyPreviousStateArray[key]=== undefined)
+
+        // handle keyboard inputs
+        for (const key of Object.keys(keyStateArray))
         {
-            keyPreviousStateArray[key] = false;
+            if (keyPreviousStateArray[key]=== undefined)
+            {
+                keyPreviousStateArray[key] = false;
+            }
+            readInput(key, keyStateArray[key], keyPreviousStateArray[key]);
+            keyPreviousStateArray[key] = keyStateArray[key];
         }
-        readInput(key, keyStateArray[key], keyPreviousStateArray[key]);
-        keyPreviousStateArray[key] = keyStateArray[key];
+
+        // process input actions
+        for (const key of Object.keys(actionArray))
+        {
+            var prev = previousActionArray[key];
+            var curr = actionArray[key];
+            handleInput(key, prev, curr);
+            previousActionArray[key] = actionArray[key];
+        }
+
+        draw();
     }
-    
-    // process input actions
-    for (const key of Object.keys(actionArray))
-    {
-        var prev = previousActionArray[key];
-        var curr = actionArray[key];
-        handleInput(key, prev, curr);
-        previousActionArray[key] = actionArray[key];
-    }
-    
-    draw();
- 
-    lastRender = timestamp;
-  window.requestAnimationFrame(loop);
 }
 function readInput(input, curr, prev)
 {
     var key = resolveBindings(input);
     if (prev === false && curr === true)
     {
+        if (showInputs)
+        {
+            pressedKeys.push(input);
+        }
         keydown(key);
     }
     else 
     if (prev === true && curr === false)
     {
+        if (showInputs)
+        {
+            pressedKeys = pressedKeys.filter( e => e !== input);
+        }
         keyup(key);
     }
 }
@@ -1317,12 +1362,12 @@ function handleInput(code, prev, curr)
                         
                         if (ARR_VALUE === -1)
                         {
-                            // if ARR is set to 0, tuck the piece to the wall right away.
+                            // if ARR is set to -1, tuck the piece to the wall right away.
                             while(canMove(fallingShape, right))
                             {
                                 move(right);
                             }
-                            isLeftDas = true;
+                            isRightDas = true;
                         }
                         else
                         {
@@ -1372,7 +1417,6 @@ function handleInput(code, prev, curr)
                     {
                         move(down);
                     }
-                    shapeHasLanded(false);
                 }
                 else
                 {
@@ -1384,10 +1428,6 @@ function handleInput(code, prev, curr)
                             move(down);
                             sdr = SDR_VALUE;
                         }
-                    }
-                    else
-                    {
-                        shapeHasLanded(false);
                     }
                 }
             }
@@ -1469,7 +1509,6 @@ function handleInput(code, prev, curr)
             break;
     }
 }
-var lastRender = 0;
 window.requestAnimationFrame(loop);
 
 var targetShape;
@@ -1594,7 +1633,6 @@ var demoDelay = 5;
             initTargetGrid();
             draw();
         }
-
 if (window.File && window.FileReader && window.FileList && window.Blob) {
   // Great success!
   function handleJSONDrop(evt) {
@@ -1731,12 +1769,16 @@ function importSettings(settings)
     {
         var handling = settings.handling;
         SDR_VALUE = handling.SDR_VALUE;
-        ARR_VALUE = handling.ARR_VALUE;
+        if (gameMode === 9)
+        {
+            playerArrSetting = handling.ARR_VALUE;
+        }
+        else
+        {
+            ARR_VALUE = handling.ARR_VALUE;
+        }
         DAS_VALUE = handling.DAS_VALUE;
     }
 }
 
-
 init();
-        
-        
