@@ -222,7 +222,7 @@ var playerArrSetting;
                 exportSettings();
                 return;
             }
-            if (code === "numpadsubstract")
+            if (code === "numpadsubtract")
             {
                 showGhost = !showGhost;
                 return;
