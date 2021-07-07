@@ -9,9 +9,14 @@
 <body>
  <canvas id="canvas"></canvas>
  <br>
- <div style="width:10;height:10;overflow-y:scroll">
-    <table>
-        <caption>Game Controls</caption>
+ <div>
+    Need help? <a href="https://github.com/kbz/kbz.github.io/wiki/Finesse.io-Wiki" target="_blank" rel="noopener noreferrer" title="There's a FAQ!" > Check the finesse.io wiki! </a> (Opens a new tab)
+    <br>
+    All the finesse moves are based on the <a href='https://harddrop.com/wiki/0G_60_Hz_SRS_Movement_Finesse'>0G 60Hz SRS Finesse</a> listed on the harddrop wiki.
+    <br>
+    <br>
+        <table>
+        <caption>Controls Cheatsheet(if you're using custom settings, this may not apply)</caption>
         <thead>
             <tr>
                 <th>Action</th>
@@ -63,17 +68,27 @@
             </tr>
             <tr>
                 <td>Change Game Mode</td>
-                <td>[/]</td>
+                <td>numpad [/]</td>
                 <td colspan="3">&nbsp;</td>
             </tr>
             <tr>
                 <td>Hide/Show Ghost</td>
-                <td>[-]</td>
+                <td>numpad [-]</td>
                 <td colspan="3">&nbsp;</td>
             </tr>
             <tr>
                 <td>Export Settings</td>
-                <td>[*]</td>
+                <td>numpad [*]</td>
+                <td colspan="3">&nbsp;</td>
+            </tr>
+            <tr>
+                <td>Toggle Inputs</td>
+                <td>[F1]</td>
+                <td colspan="3">&nbsp;</td>
+            </tr>
+            <tr>
+                <td>Toggle Master Mode*</td>
+                <td>numpad [+]</td>
                 <td colspan="3">&nbsp;</td>
             </tr>
         </tbody>
@@ -87,46 +102,7 @@
             </tr>
         </tfoot>
     </table>
-    <br>
-    To rebind your controls, first export the settings by pressing [*]. Then update the json file (the values in the "keybinds" section). When you're done, save the file and drag & drop it into this page.
-    <br>
-    Click anywhere in the game screen to reset your current progress.
-    <br>
-    To modify any of the settings of the game, first export the settings by pressing [*] on your keyboard.
-    <br>
-    Open up the downloaded file on your text editor of choice, and set the values as you see fit.
-    <br>
-    Once you're done modifying the settings file, save it, then drag and drop it into this page, the settings will be imported automatically.
-    <br>
-    * Note that this program doesn't store any files in your system so every time you reload this page, you may need to re-import your settings.
-    <br>
-
-    <table>
-        <caption>GLOSSARY</caption>
-        <thead>
-            <tr>
-                <td>Term</td>
-                <td>Definition</td>
-            </tr>
-        </thead>
-        <tbody>
-            <tr>
-                <td>DAS</td>
-                <td>Delayed Auto-Shift: DAS refers to the delay before the Auto-Shifting occurs.</td>
-            </tr>
-            <tr>
-                <td>ARR</td>
-                <td>Auto Repeat Rate: refers to the rate at which shifting automatically occurs.<br>If the value is -1, the piece will move against the wall immediately after shifting is triggered.<br>A change in direction will cause this to be reset.</td>
-            </tr>
-            <tr>
-                <td>SDR</td>
-                <td>Soft-Drop Rate: refers to the rate at which the piece moves down ONCE. <br>If the SDR value is set to 0, the piece will move down every frame; if the value is set to -1 it will move instantly to the bottom.</td>
-            </tr>
-        </tbody>
-    </table>
-
-    All the finesse moves are based on the <a href='https://harddrop.com/wiki/0G_60_Hz_SRS_Movement_Finesse'>0G 60Hz SRS Finesse</a> listed on the harddrop wiki.
-
+    * only works with the Free Stacking mode
 </div>
 
 <script src="scripts/grids/library.js" ></script>
