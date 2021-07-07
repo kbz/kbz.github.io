@@ -440,11 +440,10 @@ var playerArrSetting;
                 
                 moveList = [];
                 addShape(fallingShape);
-                console.log(fallingShapeRow);
-                if (fallingShapeRow < 21) {
-                    scoreboard.setGameOver();
-                    scoreboard.setTopscore();
-                } else {
+            if (fallingShapeRow <= STARTING_ROW) {
+                scoreboard.setGameOver();
+                scoreboard.setTopscore();
+            } else {
                     removeLines();
     //                scoreboard.addLines();
                 }
@@ -509,7 +508,8 @@ var playerArrSetting;
             }
             moveList = [];
             addShape(fallingShape);
-            if (fallingShapeRow < 21) {
+            
+            if (fallingShapeRow <= STARTING_ROW) {
                 scoreboard.setGameOver();
                 scoreboard.setTopscore();
             } else {
