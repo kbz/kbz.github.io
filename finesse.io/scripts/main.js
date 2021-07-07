@@ -440,7 +440,8 @@ var playerArrSetting;
                 
                 moveList = [];
                 addShape(fallingShape);
-                if (fallingShapeRow < 2) {
+                console.log(fallingShapeRow);
+                if (fallingShapeRow < 21) {
                     scoreboard.setGameOver();
                     scoreboard.setTopscore();
                 } else {
@@ -508,7 +509,7 @@ var playerArrSetting;
             }
             moveList = [];
             addShape(fallingShape);
-            if (fallingShapeRow < 2) {
+            if (fallingShapeRow < 21) {
                 scoreboard.setGameOver();
                 scoreboard.setTopscore();
             } else {
@@ -1212,6 +1213,12 @@ function loop(timestamp) {
                   demoDelay--;
               }
           }
+        }
+        
+        if (scoreboard.isGameOver())
+        {
+            draw();
+            return;
         }
         // handle inputs
         // NOTE: Inputs are parsed into actions to be performed
