@@ -335,6 +335,12 @@ compareMoves = function(src, target)
     var moveList = target;
     var srcMoves = src;
     var matches = [];
+    // if we used less steps than the finesse steps, then count it as correct
+    // applies to cases where the player uses das preservation
+    if (srcMoves.length < target[0].length)
+    {
+        return true;
+    }
     for (var t = 0; t < target.length; t++)
     {
         var currentTarget = moveList[t];
