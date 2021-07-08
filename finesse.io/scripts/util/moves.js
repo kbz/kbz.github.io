@@ -28,7 +28,10 @@ const MOVES = [
         // horizontal
         [
         [[DAS_LEFT, DROP]],
-        [[LEFT, LEFT, DROP]],
+        [
+            [LEFT, LEFT, DROP],
+            [DAS_LEFT, RIGHT, DROP]
+        ],
         [[LEFT, DROP]],
         [[DROP]],
         [[RIGHT, DROP]],
@@ -44,7 +47,10 @@ const MOVES = [
         [[ROTATE_COUNTER, DROP]],
         [[ROTATE_CLOCK, DROP]],
         [[ROTATE_CLOCK, RIGHT, DROP]],
-        [[ROTATE_CLOCK, RIGHT, RIGHT, DROP]],
+        [
+            [ROTATE_CLOCK, RIGHT, RIGHT, DROP],
+            [DAS_RIGHT, LEFT, ROTATE_COUNTER, DROP]
+        ],
         [[DAS_RIGHT, ROTATE_COUNTER, DROP]],
         [[ROTATE_CLOCK, DAS_RIGHT, DROP]]
         ]
@@ -54,7 +60,10 @@ const MOVES = [
         // horizontal
         [
         [[DAS_LEFT, DROP]],
-        [[LEFT, LEFT, DROP]],
+        [
+            [LEFT, LEFT, DROP],
+            [DAS_LEFT, RIGHT, DROP]
+        ],
         [[LEFT, DROP]],
         [[DROP]],
         [[RIGHT, DROP]],
@@ -70,7 +79,10 @@ const MOVES = [
         [[ROTATE_COUNTER, DROP]],
         [[ROTATE_CLOCK, DROP]],
         [[ROTATE_CLOCK, RIGHT, DROP]],
-        [[ROTATE_CLOCK, RIGHT, RIGHT, DROP]],
+        [
+            [ROTATE_CLOCK, RIGHT, RIGHT, DROP],
+            [DAS_RIGHT, LEFT, ROTATE_COUNTER, DROP]
+        ],
         [[DAS_RIGHT, ROTATE_COUNTER, DROP]],
         [[ROTATE_CLOCK, DAS_RIGHT, DROP]]
         ]
@@ -80,11 +92,17 @@ const MOVES = [
         // horizontal
         [
         [[DAS_LEFT, DROP]],
-        [[LEFT, LEFT, DROP]],
+        [
+            [LEFT, LEFT, DROP],
+            [DAS_LEFT, RIGHT, DROP]
+        ],
         [[LEFT, DROP]],
         [[DROP]],
         [[RIGHT, DROP]],
-        [[RIGHT, RIGHT, DROP]],
+        [
+            [RIGHT, RIGHT, DROP],
+            [DAS_RIGHT, LEFT, DROP]
+        ],
         [[DAS_RIGHT, DROP]]
         ],
         // vertical
@@ -106,7 +124,10 @@ const MOVES = [
         // flat down
         [
         [[DAS_LEFT, DROP]],
-        [[LEFT, LEFT, DROP]],
+        [
+            [LEFT, LEFT, DROP],
+            [DAS_LEFT, RIGHT, DROP]
+        ],
         [[LEFT, DROP]],
         [[DROP]],
         [[RIGHT, DROP]],
@@ -118,7 +139,10 @@ const MOVES = [
         [
         [[ROTATE_CLOCK, DAS_LEFT, DROP]],
         [[DAS_LEFT, ROTATE_CLOCK, DROP]],
-        [[ROTATE_CLOCK, LEFT, LEFT, DROP]],
+        [
+            [ROTATE_CLOCK, LEFT, LEFT, DROP],
+            [DAS_LEFT, RIGHT, ROTATE_CLOCK, DROP]
+        ],
         [[ROTATE_CLOCK, LEFT, DROP]],
         [[ROTATE_CLOCK, DROP]],
         [[ROTATE_CLOCK, RIGHT, DROP]],
@@ -134,7 +158,9 @@ const MOVES = [
         ],
         [
             [LEFT, LEFT, ROTATE_CLOCK, ROTATE_CLOCK, DROP],
-            [LEFT, LEFT, ROTATE_COUNTER, ROTATE_COUNTER, DROP]
+            [DAS_LEFT, RIGHT, ROTATE_CLOCK, ROTATE_CLOCK, DROP],
+            [LEFT, LEFT, ROTATE_COUNTER, ROTATE_COUNTER, DROP],
+            [DAS_LEFT, RIGHT, ROTATE_COUNTER, ROTATE_COUNTER, DROP]
         ],
         [
             [LEFT, ROTATE_CLOCK, ROTATE_CLOCK, DROP],
@@ -164,7 +190,10 @@ const MOVES = [
         // flat right
         [
         [[ROTATE_COUNTER, DAS_LEFT, DROP]],
-        [[ROTATE_COUNTER, LEFT, LEFT, DROP]],
+        [
+            [ROTATE_COUNTER, LEFT, LEFT, DROP],
+            [DAS_LEFT, RIGHT, ROTATE_COUNTER, DROP]
+        ],
         [[ROTATE_COUNTER, LEFT, DROP]],
         [[ROTATE_COUNTER, DROP]],
         [[ROTATE_COUNTER, RIGHT, DROP]],
@@ -194,7 +223,10 @@ const MOVES = [
         // flat down
         [
         [[DAS_LEFT, DROP]],
-        [[LEFT, LEFT, DROP]],
+        [
+            [LEFT, LEFT, DROP],
+            [DAS_LEFT, RIGHT, DROP]
+        ],
         [[LEFT, DROP]],
         [[DROP]],
         [[RIGHT, DROP]],
@@ -206,7 +238,10 @@ const MOVES = [
         [
         [[ROTATE_CLOCK, DAS_LEFT, DROP]],
         [[DAS_LEFT, ROTATE_CLOCK, DROP]],
-        [[ROTATE_CLOCK, LEFT, LEFT, DROP]],
+        [
+            [ROTATE_CLOCK, LEFT, LEFT, DROP],
+            [DAS_LEFT, RIGHT, ROTATE_CLOCK, DROP]
+        ],
         [[ROTATE_CLOCK, LEFT, DROP]],
         [[ROTATE_CLOCK, DROP]],
         [[ROTATE_CLOCK, RIGHT, DROP]],
@@ -222,7 +257,9 @@ const MOVES = [
         ],
         [
             [LEFT, LEFT, ROTATE_CLOCK, ROTATE_CLOCK, DROP],
-            [LEFT, LEFT, ROTATE_COUNTER, ROTATE_COUNTER, DROP]
+            [DAS_LEFT, RIGHT, ROTATE_CLOCK, ROTATE_CLOCK, DROP],
+            [LEFT, LEFT, ROTATE_COUNTER, ROTATE_COUNTER, DROP],
+            [DAS_LEFT, RIGHT, ROTATE_COUNTER, ROTATE_COUNTER, DROP]
         ],
         [
             [LEFT, ROTATE_CLOCK, ROTATE_CLOCK, DROP],
@@ -252,7 +289,10 @@ const MOVES = [
         // flat right
         [
         [[ROTATE_COUNTER, DAS_LEFT, DROP]],
-        [[ROTATE_COUNTER, LEFT, LEFT, DROP]],
+        [
+            [ROTATE_COUNTER, LEFT, LEFT, DROP],
+            [DAS_LEFT, RIGHT, ROTATE_COUNTER, DROP]
+        ],
         [[ROTATE_COUNTER, LEFT, DROP]],
         [[ROTATE_COUNTER, DROP]],
         [[ROTATE_COUNTER, RIGHT, DROP]],
@@ -264,11 +304,13 @@ const MOVES = [
         
     ],
     // J-mino
-    [
-        // flat down
+    [ // flat down
         [
         [[DAS_LEFT, DROP]],
-        [[LEFT, LEFT, DROP]],
+        [
+            [LEFT, LEFT, DROP],
+            [DAS_LEFT, RIGHT, DROP]
+        ],
         [[LEFT, DROP]],
         [[DROP]],
         [[RIGHT, DROP]],
@@ -280,7 +322,10 @@ const MOVES = [
         [
         [[ROTATE_CLOCK, DAS_LEFT, DROP]],
         [[DAS_LEFT, ROTATE_CLOCK, DROP]],
-        [[ROTATE_CLOCK, LEFT, LEFT, DROP]],
+        [
+            [ROTATE_CLOCK, LEFT, LEFT, DROP],
+            [DAS_LEFT, RIGHT, ROTATE_CLOCK, DROP]
+        ],
         [[ROTATE_CLOCK, LEFT, DROP]],
         [[ROTATE_CLOCK, DROP]],
         [[ROTATE_CLOCK, RIGHT, DROP]],
@@ -296,7 +341,9 @@ const MOVES = [
         ],
         [
             [LEFT, LEFT, ROTATE_CLOCK, ROTATE_CLOCK, DROP],
-            [LEFT, LEFT, ROTATE_COUNTER, ROTATE_COUNTER, DROP]
+            [DAS_LEFT, RIGHT, ROTATE_CLOCK, ROTATE_CLOCK, DROP],
+            [LEFT, LEFT, ROTATE_COUNTER, ROTATE_COUNTER, DROP],
+            [DAS_LEFT, RIGHT, ROTATE_COUNTER, ROTATE_COUNTER, DROP]
         ],
         [
             [LEFT, ROTATE_CLOCK, ROTATE_CLOCK, DROP],
@@ -326,7 +373,10 @@ const MOVES = [
         // flat right
         [
         [[ROTATE_COUNTER, DAS_LEFT, DROP]],
-        [[ROTATE_COUNTER, LEFT, LEFT, DROP]],
+        [
+            [ROTATE_COUNTER, LEFT, LEFT, DROP],
+            [DAS_LEFT, RIGHT, ROTATE_COUNTER, DROP]
+        ],
         [[ROTATE_COUNTER, LEFT, DROP]],
         [[ROTATE_COUNTER, DROP]],
         [[ROTATE_COUNTER, RIGHT, DROP]],
