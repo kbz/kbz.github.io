@@ -88,6 +88,7 @@ var gameMode = 0;
         
         var   showBoard = true;
         var   showInputs = false;
+        var   retryOnFinesseFault = false;
         var   pressedKeys = [];
         var   ARR_VALUE = 1;
         var   SDR_VALUE = 1;
@@ -251,6 +252,11 @@ var playerArrSetting;
             if (code === "f1")
             {
                 showInputs = !showInputs;
+                return;
+            }
+            if (code === "f2")
+            {
+                retryOnFinesseFault = !retryOnFinesseFault;
                 return;
             }
             if (code === "numpaddivide")
@@ -480,9 +486,41 @@ var playerArrSetting;
         else
         {
             lockDelay = DEF_LOCK_DELAY;
+            var correct;
+            var orientation;
+            var column;
             if (gameMode < 8)
             {
-                if (compareMoves(moveList, targetMoves))
+                // in case of S, Z and I the target shape column may be 1 away from the falling shape's 
+                // we need to account for this when checking for finesse faults.
+                if (fallingShape.ordinal === 0 || fallingShape.ordinal === 1 || fallingShape.ordinal === 2)
+                {
+                    if (fallingShape.orientation === 1 && targetShape.orientation === 3)
+                    {
+                        orientation = 3;
+                        column = fallingShapeCol + 1;
+                    }
+                    else
+                    {
+                        orientation = fallingShape.orientation;
+                        column = fallingShapeCol;
+                    }
+                }
+                else
+                {
+                    orientation = fallingShape.orientation;
+                    column = fallingShapeCol;
+                }
+                correct = orientation === targetShape.orientation && fallingShapeRow === targetRow && column === targetCol && compareMoves(moveList, targetMoves);
+            }
+            else
+            {
+                var moves = fallingShape.getMoves(fallingShapeCol);
+                correct = compareMoves(moveList, fallingShape.getMoves(fallingShapeCol));
+            }
+            if (gameMode < 8)
+            {
+                if (correct)
                 {
                     scoreboard.addScore(1);
                     scoreboard.addCorrect(1);
@@ -523,7 +561,17 @@ var playerArrSetting;
                     }
             }
             moveList = [];
-            addShape(fallingShape);
+            if (gameMode === 8)
+            {
+                if (retryOnFinesseFault && !correct)
+                {
+                    console.log("finesse fault!");
+                }
+                else
+                {
+                    addShape(fallingShape);
+                }
+            }
             
             if (fallingShapeRow <= STARTING_ROW) {
                 scoreboard.setGameOver();
@@ -532,19 +580,41 @@ var playerArrSetting;
                 removeLines();
 //                scoreboard.addLines();
             }
-            if (gameMode <= GAME_MODE_7)
+            if (gameMode < GAME_MODE_8)
             {
-                startNewGame();
+                if (!correct && retryOnFinesseFault)
+                {
+                    retry();
+                }
+                else
+                {
+                    startNewGame();
+                }
             }
-            else if (gameMode === GAME_MODE_9)
+            if (gameMode === GAME_MODE_9)
             {
                 startNewGame();
             }
             else{
-                selectShape();
-                selectTarget(); 
+                if (!correct && retryOnFinesseFault)
+                {
+                    retry();
+                }
+                else
+                {
+                    selectShape();
+                    selectTarget(); 
+                }
             }
        }
+   }
+   
+   function retry()
+   {
+        fallingShapeRow = STARTING_ROW;
+        fallingShapeCol = STARTING_COL;
+       var newShape = new Shape(fallingShapeCol, fallingShapeRow, minos[fallingShape.ordinal], fallingShape.ordinal, 0, MOVES[fallingShape.ordinal] );
+       fallingShape = newShape;
    }
  
         function removeLines() {
@@ -1059,7 +1129,8 @@ var playerArrSetting;
             {
                 g.fillText('IMMEDIATE (-1)', settingsX, settingsY+75);
             }
-
+            g.fillText('Retry on Fault:',  settingsX, settingsY+90 );
+            g.fillText(retryOnFinesseFault ? "On" : "Off",  settingsX, settingsY+105);
             if (messages.length > 0)
             {
                 var message = messages[0];
@@ -1750,7 +1821,7 @@ function exportSettings()
         'ARR_VALUE': ARR_VALUE,
         'DAS_VALUE': DAS_VALUE
         
-    }
+    };
     const filename = 'settings.json';
     const jsonStr = JSON.stringify(settings, null, 2);
 
