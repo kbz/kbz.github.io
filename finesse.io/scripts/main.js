@@ -24,7 +24,7 @@ const KEY_CLOCK = 'ROTATE_C';
 const KEY_COUNTERCLOCK = 'ROTATE_CC';
 const KEY_HOLD =  'HOLD';
 const KEY_MODE = 'MODE';
-const KEY_START = 'START';
+const KEY_RESET = 'START';
 
 const GAME_MODE_0 = 0; // random pieces; reset on each drop
 const GAME_MODE_1 = 1; // Z piece only; reset on each drop
@@ -46,7 +46,9 @@ var defaultKeyboardBindings = [
     ['arrowright', KEY_RIGHT],
     ['keyx', KEY_CLOCK],
     ['keyz', KEY_COUNTERCLOCK],
-    ['keyc', KEY_HOLD]
+    ['keyc', KEY_HOLD],
+    ['escape', KEY_RESET],
+    ['tab', KEY_MODE]
 ];
 var keyboardBindings = [
     ['arrowup', KEY_DROP],
@@ -55,7 +57,9 @@ var keyboardBindings = [
     ['arrowright', KEY_RIGHT],
     ['keyx', KEY_CLOCK],
     ['keyz', KEY_COUNTERCLOCK],
-    ['keyc', KEY_HOLD]
+    ['keyc', KEY_HOLD],
+    ['escape', KEY_RESET],
+    ['tab', KEY_MODE]
 ];
 var defaultControllerBindings = [
     [12, KEY_DROP],
@@ -64,7 +68,9 @@ var defaultControllerBindings = [
     [15, KEY_RIGHT],
     [1, KEY_CLOCK],
     [0, KEY_COUNTERCLOCK],
-    [5, KEY_HOLD]
+    [5, KEY_HOLD],
+    [8, KEY_RESET],
+    [9, KEY_MODE]
 ];
 var controllerBindings = [
     [12, KEY_DROP],
@@ -73,7 +79,9 @@ var controllerBindings = [
     [15, KEY_RIGHT],
     [1, KEY_CLOCK],
     [0, KEY_COUNTERCLOCK],
-    [5, KEY_HOLD]
+    [5, KEY_HOLD],
+    [8, KEY_RESET],
+    [9, KEY_MODE]
 ];
 
 var gameMode = 0;
@@ -86,10 +94,18 @@ var gameMode = 0;
         canvas.height = 640;
         var activeGamepad;
         
+        
+        var settingsIcon = new Image();
+        settingsIcon.src = "resources/img/settings-icon.png";
+        var settingsButton = {
+            x: 10,
+            y: 10, 
+            h: 20,
+            w: 20
+        };
+        
         var   showBoard = true;
-        var   showInputs = false;
         var   retryOnFinesseFault = false;
-        var   pressedKeys = [];
         var   ARR_VALUE = 1;
         var   SDR_VALUE = 1;
         var   DAS_VALUE = 12;
@@ -161,6 +177,8 @@ var gameMode = 0;
         var bgColor = '#DDEEFF';
         var gridColor = '#BECFEA';
         var gridBorderColor = '#7788AA';
+        var applyColor = '#00FF00';
+        var cancelColor = '#FF0000';
         var largeStroke = 5;
         var smallStroke = 2;
  
@@ -187,15 +205,6 @@ var gameMode = 0;
         var usedHold = false;
         var showGhost = true;
         
-        function keydown(id)
-        {
-            actionArray[id] = true;
-        }
-        
-        function keyup(id)
-        {
-            actionArray[id] = false;
-        }
         
         window.addEventListener("gamepadconnected", function(e) {
 
@@ -214,75 +223,26 @@ var gameMode = 0;
           
         
         
-        addEventListener('click', function () {
-            startNewGame();
-            scoreboard.wipe();
-            moveList = [];
+        addEventListener('click', function (event) {
+            currentScene.onClick(event);
         });
  
         addEventListener('keyup', function (event) {
-            var code = event.code.toString().toLowerCase();
-            keyStateArray[code] = false;
+            currentScene.onKeyUp(event);
+//            var code = event.code.toString().toLowerCase();
+//            keyStateArray[code] = false;
         });
         
 var playerArrSetting;
 
         addEventListener('keydown', function (event) {
-            var code = event.code.toString().toLowerCase();
-            // prevent from down/up/space causing in-page navigation while playing...
-            if (code !== "f12" && code !== "f5")
-            {
-                event.preventDefault();
-            }
-            if (code === "numpadmultiply")
-            {
-                exportSettings();
-                return;
-            }
-            if (code === "numpadsubtract")
-            {
-                showGhost = !showGhost;
-                return;
-            }
-            if (code === "numpadadd")
-            {
-                showBoard = !showBoard;
-                return;
-            }
-            if (code === "f1")
-            {
-                showInputs = !showInputs;
-                return;
-            }
-            if (code === "f2")
-            {
-                retryOnFinesseFault = !retryOnFinesseFault;
-                return;
-            }
-            if (code === "numpaddivide")
-            {
-                
-                gameMode++;
-                if (gameMode === GAME_MODE_9)
-                {
-                    playerArrSetting = ARR_VALUE;
-                    ARR_VALUE = 0;
-                }
-                if (gameMode > GAME_MODE_9)
-                {
-                    ARR_VALUE = playerArrSetting;
-                    gameMode = GAME_MODE_0;
-                }
-                
-                initBags();
-                selectShape();
-                selectTarget();
-                scoreboard.wipe();
-                moveList = [];
-                return;
-            }
-            keyStateArray[code] = true;
+            currentScene.onKeyDown(event);
     });
+ 
+    function isWithinBoundingBox(x, y, box)
+    {
+        return x < box.x + box.w && x > box.x && y < box.y + box.h && y > box.y;
+    }
  
     function resolveBindings(code)
     {
@@ -298,7 +258,6 @@ var playerArrSetting;
                 return controllerBindings[i][1];
         }
     }
-    
  
         function canRotate(s, direction) { 
             var tempShape = new Shape(s.x, s.y, s.matrix, s.ordinal, s.orientation);
@@ -841,7 +800,7 @@ var playerArrSetting;
  
         function draw() {
             g.clearRect(0, 0, canvas.width, canvas.height);
- 
+                    
             drawUI();
  
             if (scoreboard.isGameOver()) {
@@ -1095,18 +1054,6 @@ var playerArrSetting;
                 g.fillText('finesse (%): ', scoreX, scoreY + 180);
                 g.fillText(Math.floor((100*scoreboard.getCorrect() / scoreboard.getTotal())), scoreX, scoreY + 195);
             }
-            if (showInputs)
-            {
-                var offset = 15;
-                g.fillText('Inputs:', scoreX, scoreY + 195 + offset);
-                offset += 15;
-                for (var i = 0; i < pressedKeys.length; i++)
-                {
-                    var input = pressedKeys[i];
-                    g.fillText(input, scoreX, scoreY + 195 + offset);
-                    offset += 15;
-                }
-            }
             g.fillText( scoreboard.getTotal(), scoreX, scoreY + 135);
 
             g.fillText('ARR:', settingsX, settingsY);
@@ -1144,9 +1091,13 @@ var playerArrSetting;
                     messageTime = MESSAGE_DURATION;
                 }
             }
+            
+            //g.strokeRect(settingsButton.x, settingsButton.y, settingsButton.w, settingsButton.h);
+            g.drawImage(settingsIcon, settingsButton.x, settingsButton.y, settingsButton.w, settingsButton.h);
 
         }
  
+
         function drawFallingShape() {
             for (var y = 0; y < fallingShape.matrix.length; y++){
                 for (var x = 0; x < fallingShape.matrix[y].length; x++)
@@ -1179,6 +1130,7 @@ var demoButtonPressed = false;
 var now;
 var elapsed;
 var then = Date.now();
+var currentScene;
 function loop(timestamp) {
  
     requestAnimationFrame(loop);
@@ -1187,425 +1139,15 @@ function loop(timestamp) {
     elapsed = now - then;
     if (elapsed > fpsInterval)
     {
-        
+        if (currentScene){
+            currentScene.update(timestamp);
+            currentScene.draw();
+        }
         then = now - (elapsed % fpsInterval);
-  // game mode 9: demo/auto mode this breaks if ARR is set to 0
-        if (gameMode === GAME_MODE_9)
-        {
-            if (targetMoves.length !== 0)
-            {
-                if (demoDelay === 0)
-                {
-                    var cm = targetMoves[0][currentMove];
-                    switch (cm)
-                    {
-                    case DAS_RIGHT:
-                        if (!demoButtonPressed)
-                        {
-                            keydown(KEY_RIGHT);
-                            demoButtonPressed = true;
-                        }
-                        else 
-                        {
-                            if (isRightDas)
-                            {
-                                keyup(KEY_RIGHT);
-                                demoButtonPressed = false;
-                                currentMove++;
-                                demoDelay = DEMO_DELAY;
-                            }
-                        }
-                        break;
-                    case RIGHT:
-                        if (!demoButtonPressed)
-                        {
-                            keydown(KEY_RIGHT);
-                            demoButtonPressed = true;
-                        } else
-                        {
-                            keyup(KEY_RIGHT);
-                            demoButtonPressed = false;
-                            currentMove++;
-                            demoDelay = DEMO_DELAY;
-                        }
-                        break;
-                    case LEFT:
-                        if (!demoButtonPressed)
-                        {
-                            keydown(KEY_LEFT);
-                            demoButtonPressed = true;
-                        }
-                        else
-                        {
-                            keyup(KEY_LEFT);
-                            demoButtonPressed = false;
-                            currentMove++;
-                            demoDelay = DEMO_DELAY;
-                        }
-                        break;
-                    case DAS_LEFT:
-                        if (!demoButtonPressed)
-                        {
-                            keydown(KEY_LEFT);
-                            demoButtonPressed = true;
-                        }
-                        else
-                        {
-                            if (isLeftDas)
-                            {
-                                keyup(KEY_LEFT);
-                                demoButtonPressed = false;
-                                currentMove++;
-                                demoDelay = DEMO_DELAY;
-                            }
-                        }
-                        break;
-                    case DROP:
-                        while(canMove(fallingShape, down))
-                        {
-                            move(down);
-                        }
-                        moveList.push(DROP);
-                        shapeHasLanded(true);
-                        break;
-                    case ROTATE_CLOCK:
-                        if (!demoButtonPressed)
-                        {
-                            keydown(KEY_CLOCK);
-                            demoButtonPressed = true;
-                        }
-                        else
-                        {
-                            keyup(KEY_CLOCK);
-                            currentMove++;
-                            demoButtonPressed = false;
-                            demoDelay = DEMO_DELAY;
-                        }
-                    break;
-                  case ROTATE_COUNTER:
-                      if (!demoButtonPressed)
-                      {
-                          keydown(KEY_COUNTERCLOCK);
-                          demoButtonPressed = true;
-                      }
-                      else
-                      {
-                          keyup(KEY_COUNTERCLOCK);
-                          currentMove++;
-                          demoButtonPressed = false;
-                          demoDelay = DEMO_DELAY;
-                      }
-                      break;
-                  }
-              }
-              else 
-              {
-                  demoDelay--;
-              }
-          }
-        }
-        
-        if (scoreboard.isGameOver())
-        {
-            draw();
-            return;
-        }
-        // handle inputs
-        // NOTE: Inputs are parsed into actions to be performed
-        // And will be processed exactly once per frame.
-        // If keyboard and controller perform an input, they'll be performed exactly once.
-        // If both keyboard and controller perform the same input, it'll be performed only once.
-
-        // handle gamepad inputs
-        if(navigator.getGamepads()) {
-            var gp = navigator.getGamepads()[0];
-            if (gp !== undefined && gp !== null)
-            {
-                for (var b = 0; b < gp.buttons.length; b++)
-                {
-                    if (previousButtonStates[b] === undefined)
-                    {
-                        previousButtonStates[b] = false;
-                    }
-                    readInput(b, gp.buttons[b].pressed, previousButtonStates[b]);
-                    previousButtonStates[b] = gp.buttons[b].pressed;
-                }
-            }
-        }
-
-        // handle keyboard inputs
-        for (const key of Object.keys(keyStateArray))
-        {
-            if (keyPreviousStateArray[key]=== undefined)
-            {
-                keyPreviousStateArray[key] = false;
-            }
-            readInput(key, keyStateArray[key], keyPreviousStateArray[key]);
-            keyPreviousStateArray[key] = keyStateArray[key];
-        }
-
-        // process input actions
-        for (const key of Object.keys(actionArray))
-        {
-            var prev = previousActionArray[key];
-            var curr = actionArray[key];
-            handleInput(key, prev, curr);
-            previousActionArray[key] = actionArray[key];
-        }
-
-        draw();
-    }
-}
-function readInput(input, curr, prev)
-{
-    var key = resolveBindings(input);
-    if (prev === false && curr === true)
-    {
-        if (showInputs)
-        {
-            pressedKeys.push(input);
-        }
-        keydown(key);
-    }
-    else 
-    if (prev === true && curr === false)
-    {
-        if (showInputs)
-        {
-            pressedKeys = pressedKeys.filter( e => e !== input);
-        }
-        keyup(key);
     }
 }
 var sdr = SDR_VALUE;
 
-function handleInput(code, prev, curr)
-{
-    switch (code)
-    {
-        case KEY_LEFT:
-            // holding left
-            if (curr && !prev)
-            {
-                if (canMove(fallingShape, left))
-                    move(left);
-                DasCounter = ARR_VALUE;
-                longPressDelay = DAS_VALUE;
-            }
-            if (prev && curr)
-            {
-                // reduce the DAS counter
-                // if DAS counter = 0
-                // move the piece towards the wall
-                // every ARR frames
-                longPressDelay--;
-                if (longPressDelay <= 0)
-                {
-                    DasCounter--;
-                    if (DasCounter <= 0)
-                    {
-                        
-                        if (ARR_VALUE === -1)
-                        {
-                            // if ARR is set to -1, tuck the piece to the wall right away.
-                            while(canMove(fallingShape, left))
-                            {
-                                move(left);
-                            }
-                            isLeftDas = true;
-                        }
-                        else
-                        {
-                            if (canMove(fallingShape, left))
-                                move(left);
-                            else
-                                isLeftDas = true;
-                            DasCounter = ARR_VALUE;
-                        }
-                    }
-                }            
-            }
-            if (prev && !curr)
-            {
-                if (isLeftDas)
-                    moveList.push(DAS_LEFT);
-                else
-                    moveList.push(LEFT);
-                isLeftDas = false;
-            }    
-            break;
-        case KEY_RIGHT:
-            
-            // holding left
-            if (curr && !prev)
-            {
-                if (canMove(fallingShape, right))
-                    move(right);
-                DasCounter = ARR_VALUE;
-                longPressDelay = DAS_VALUE;
-            }
-            if (prev && curr)
-            {
-                // reduce the DAS counter
-                // if DAS counter = 0
-                // move the piece towards the wall
-                // every ARR frames
-                longPressDelay--;
-                if (longPressDelay <= 0)
-                {
-                    DasCounter--;
-                    if (DasCounter <= 0)
-                    {
-                        
-                        if (ARR_VALUE === -1)
-                        {
-                            // if ARR is set to -1, tuck the piece to the wall right away.
-                            while(canMove(fallingShape, right))
-                            {
-                                move(right);
-                            }
-                            isRightDas = true;
-                        }
-                        else
-                        {
-                            if (canMove(fallingShape, right))
-                                move(right);
-                            else
-                                isRightDas = true;
-                            DasCounter = ARR_VALUE;
-                        }
-                    }
-                }            
-            }
-            if (prev && !curr)
-            {
-                if (isRightDas)
-                    moveList.push(DAS_RIGHT);
-                else
-                    moveList.push(RIGHT);
-                isRightDas = false;
-            }    
-            break;
-        case KEY_DOWN:
-            if (curr && !prev)
-            {
-                if (SDR_VALUE === -1)
-                {
-                    while (canMove(fallingShape, down) )
-                    {
-                        move(down);
-                    }
-                }
-                else 
-                {
-                    if (canMove(fallingShape, down))
-                    {
-                        move(down);
-                    }
-                    sdr = SDR_VALUE;
-                }
-            }
-            // holding down
-            if (prev && curr)
-            {
-                if (SDR_VALUE === -1)
-                {
-                    while (canMove(fallingShape, down) )
-                    {
-                        move(down);
-                    }
-                }
-                else
-                {
-                    sdr--;
-                    if (canMove(fallingShape, down))
-                    {
-                        if (sdr < 0)
-                        {
-                            move(down);
-                            sdr = SDR_VALUE;
-                        }
-                    }
-                }
-            }
-            if (prev && !curr)
-            {
-                moveList.push(SOFT_DROP);
-            }    
-            break;
-        case KEY_DROP:
-            if (curr && !prev)
-            {
-                while (canMove(fallingShape, down) )
-                {
-                    move(down);
-                }
-                moveList.push(DROP);
-                shapeHasLanded(true);
-            }
-            break;
-        case KEY_CLOCK:
-            if (curr && !prev)
-            {
-                if (canRotate(fallingShape, clockwise))
-                {
-                    rotate(fallingShape, clockwise);
-                }
-                moveList.push(ROTATE_CLOCK);
-            }
-            break;
-        case KEY_COUNTERCLOCK:
-            if (curr && !prev)
-            {
-                if (canRotate(fallingShape, counterclockwise))
-                {
-                    rotate(fallingShape, counterclockwise);
-                }
-                moveList.push(ROTATE_COUNTER);
-            }
-            break;
-        case KEY_HOLD:
-            
-            if (curr && !prev)
-            {
-                if (gameMode !== 8)
-                    break;
-                // hold
-                if (usedHold)
-                    break;
-
-                if (hold === undefined)
-                {
-                    // empty hold = hold current piece and get a new one from the bag
-                    hold = fallingShape;
-                    for (var orient = fallingShape.orientation; orient > 0; orient--)
-                    {
-                        rotate(hold, counterclockwise);
-                    }
-                    selectShape();
-                }
-                else 
-                {
-                    // not empty hold = swap pieces;
-                    var tmp = fallingShape;
-                    for (var orient = fallingShape.orientation; orient > 0; orient--)
-                    {
-                        rotate(tmp, counterclockwise);
-                    }
-                    fallingShape = hold;
-                    hold = tmp;
-
-                }
-                usedHold = true;
-                fallingShapeRow = STARTING_ROW;
-                fallingShapeCol = STARTING_COL;
-                moveList = [];
-            }
-            break;
-        default:
-            break;
-    }
-}
 window.requestAnimationFrame(loop);
 
 var targetShape;
@@ -1804,7 +1346,9 @@ function exportSettings()
                 KEY_RIGHT: getKeyboardInputForCode(KEY_RIGHT),
                 KEY_CLOCK: getKeyboardInputForCode(KEY_CLOCK),
                 KEY_COUNTERCLOCK: getKeyboardInputForCode(KEY_COUNTERCLOCK),
-                KEY_HOLD: getKeyboardInputForCode(KEY_HOLD)
+                KEY_HOLD: getKeyboardInputForCode(KEY_HOLD),
+                KEY_RESET: getKeyboardInputForCode(KEY_RESET),
+                KEY_MODE: getKeyboardInputForCode(KEY_MODE)
             };
     settings.keybinds.controller = 
             {
@@ -1814,13 +1358,19 @@ function exportSettings()
                 KEY_RIGHT: getControllerInputForCode(KEY_RIGHT),
                 KEY_CLOCK: getControllerInputForCode(KEY_CLOCK),
                 KEY_COUNTERCLOCK: getControllerInputForCode(KEY_COUNTERCLOCK),
-                KEY_HOLD: getControllerInputForCode(KEY_HOLD)
+                KEY_HOLD: getControllerInputForCode(KEY_HOLD),
+                KEY_RESET: getControllerInputForCode(KEY_RESET),
+                KEY_MODE: getControllerInputForCode(KEY_MODE)
             };
     settings.handling = {
         'SDR_VALUE': SDR_VALUE,
         'ARR_VALUE': ARR_VALUE,
         'DAS_VALUE': DAS_VALUE
-        
+    };
+    settings.other = {
+        'retryOnFault': retryOnFinesseFault,
+        'showGhost' : showGhost,
+        'masterMode':!showBoard
     };
     const filename = 'settings.json';
     const jsonStr = JSON.stringify(settings, null, 2);
@@ -1849,6 +1399,8 @@ function importSettings(settings)
         keyboardBindings.push([keybinds.KEY_CLOCK, KEY_CLOCK]);
         keyboardBindings.push([keybinds.KEY_COUNTERCLOCK, KEY_COUNTERCLOCK]);
         keyboardBindings.push([keybinds.KEY_HOLD, KEY_HOLD]);
+        keyboardBindings.push([keybinds.KEY_MODE, KEY_MODE]);
+        keyboardBindings.push([keybinds.KEY_RESET, KEY_RESET]);
     }
     if (settings.keybinds.controller)
     {
@@ -1861,6 +1413,8 @@ function importSettings(settings)
         controllerBindings.push([keybinds.KEY_CLOCK, KEY_CLOCK]);
         controllerBindings.push([keybinds.KEY_COUNTERCLOCK, KEY_COUNTERCLOCK]);
         controllerBindings.push([keybinds.KEY_HOLD, KEY_HOLD]);
+        controllerBindings.push([keybinds.KEY_MODE, KEY_MODE]);
+        controllerBindings.push([keybinds.KEY_RESET, KEY_RESET]);
     }
     if (settings.handling)
     {
@@ -1876,6 +1430,24 @@ function importSettings(settings)
         }
         DAS_VALUE = handling.DAS_VALUE;
     }
+    
+    if (settings.other)
+    {
+        showGhost = settings.other.showGhost;
+        retryOnFinesseFault = settings.other.retryOnFault;
+        showBoard = !settings.other.masterMode;
+    }
+}
+var gameScene = new GameScene();
+var settingsScene = new SettingsScene();
+function loadSettingsScene()
+{
+    currentScene = settingsScene;
+}
+function loadGameScene()
+{
+    currentScene =  gameScene;
 }
 
+currentScene =  gameScene;
 init();
