@@ -89,7 +89,9 @@ var gameMode = 0;
         var canvas = document.querySelector('canvas');
         const globalAlpha = 1;
         const ghostAlpha = 0.25;
-        const targetAlpha = 0.25;
+        var targetAlpha = 0.25;
+        var targetFill = "#000000";
+        var targetBorder = "#FFFFFF";
         canvas.width = 640;
         canvas.height = 640;
         var activeGamepad;
@@ -966,11 +968,11 @@ var playerArrSetting;
         }
         function drawTargetSquare(r, c) {
             var bs = blockSize;
-            g.fillStyle = "#000000";
+            g.fillStyle = targetFill;
             g.fillRect(leftMargin + c * bs, topMargin + r * bs, bs, bs);
  
             g.lineWidth = smallStroke;
-            g.strokeStyle = "#FFFFFF";
+            g.strokeStyle = targetBorder;
             g.strokeRect(leftMargin + c * bs, topMargin + r * bs, bs, bs);
         }
  
