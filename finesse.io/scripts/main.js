@@ -1269,6 +1269,7 @@ var demoDelay = 5;
         }
  
         function init() {
+            loadSettings();
             gameMode = 0;
             initGrid();
             initTargetGrid();
@@ -1393,6 +1394,8 @@ function importSettings(settings)
     if (settings.keybinds.keyboard)
     {
         var keybinds = settings.keybinds.keyboard;
+        console.log("Keyboard Keybinds");
+        console.log(keybinds);
         keyboardBindings = [];
         keyboardBindings.push([keybinds.KEY_DROP, KEY_DROP]);
         keyboardBindings.push([keybinds.KEY_DOWN, KEY_DOWN]);
@@ -1407,6 +1410,8 @@ function importSettings(settings)
     if (settings.keybinds.controller)
     {
         var keybinds = settings.keybinds.controller;
+        console.log("Controller Keybinds");
+        console.log(keybinds);
         controllerBindings = [];
         controllerBindings.push([keybinds.KEY_DROP, KEY_DROP]);
         controllerBindings.push([keybinds.KEY_DOWN, KEY_DOWN]);
@@ -1421,6 +1426,8 @@ function importSettings(settings)
     if (settings.handling)
     {
         var handling = settings.handling;
+        console.log("Handling Settings");
+        console.log(handling);
         SDR_VALUE = handling.SDR_VALUE;
         if (gameMode === 9)
         {
@@ -1435,11 +1442,69 @@ function importSettings(settings)
     
     if (settings.other)
     {
+        console.log("Other Settings");
+        console.log(settings.other);
         showGhost = settings.other.showGhost;
         retryOnFinesseFault = settings.other.retryOnFault;
         showBoard = !settings.other.masterMode;
     }
 }
+
+function loadSettings()
+{
+    var localSettings = localStorage.getItem("settings");
+    if (localSettings === null)
+    {
+        console.log("Using default settings.");
+        return;
+    }
+    console.log("Loading local settings.");
+    var settings = JSON.parse(localSettings);
+    importSettings(settings);
+}
+
+function saveSettings()
+{
+    var settings = {};
+    settings.keybinds = {};
+    settings.keybinds.keyboard = 
+            {
+                KEY_DROP: getKeyboardInputForCode(KEY_DROP),
+                KEY_DOWN: getKeyboardInputForCode(KEY_DOWN),
+                KEY_LEFT: getKeyboardInputForCode(KEY_LEFT),
+                KEY_RIGHT: getKeyboardInputForCode(KEY_RIGHT),
+                KEY_CLOCK: getKeyboardInputForCode(KEY_CLOCK),
+                KEY_COUNTERCLOCK: getKeyboardInputForCode(KEY_COUNTERCLOCK),
+                KEY_HOLD: getKeyboardInputForCode(KEY_HOLD),
+                KEY_RESET: getKeyboardInputForCode(KEY_RESET),
+                KEY_MODE: getKeyboardInputForCode(KEY_MODE)
+            };
+    settings.keybinds.controller = 
+            {
+                KEY_DROP: getControllerInputForCode(KEY_DROP),
+                KEY_DOWN: getControllerInputForCode(KEY_DOWN),
+                KEY_LEFT: getControllerInputForCode(KEY_LEFT),
+                KEY_RIGHT: getControllerInputForCode(KEY_RIGHT),
+                KEY_CLOCK: getControllerInputForCode(KEY_CLOCK),
+                KEY_COUNTERCLOCK: getControllerInputForCode(KEY_COUNTERCLOCK),
+                KEY_HOLD: getControllerInputForCode(KEY_HOLD),
+                KEY_RESET: getControllerInputForCode(KEY_RESET),
+                KEY_MODE: getControllerInputForCode(KEY_MODE)
+            };
+    settings.handling = {
+        'SDR_VALUE': SDR_VALUE,
+        'ARR_VALUE': ARR_VALUE,
+        'DAS_VALUE': DAS_VALUE
+    };
+    settings.other = {
+        'retryOnFault': retryOnFinesseFault,
+        'showGhost' : showGhost,
+        'masterMode':!showBoard
+    };
+    var jsonStr = JSON.stringify(settings);
+    localStorage.setItem("settings", jsonStr);
+}
+
 var gameScene = new GameScene();
 var settingsScene = new SettingsScene();
 function loadSettingsScene()
@@ -1448,6 +1513,11 @@ function loadSettingsScene()
 }
 function loadGameScene()
 {
+    if (currentScene === settingsScene)
+    {
+        console.log("Storing local settings.")
+        saveSettings();
+    }
     currentScene =  gameScene;
 }
 
