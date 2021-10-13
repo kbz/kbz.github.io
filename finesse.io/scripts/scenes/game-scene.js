@@ -503,6 +503,17 @@ class GameScene extends Scene
                     moveList.push(ROTATE_COUNTER);
                 }
                 break;
+            case KEY_180:
+                if (curr && !prev)
+                {
+                    if (canRotate(fallingShape, rotate180))
+                    {
+                        rotate(fallingShape, rotate180);
+                    }
+                    moveList.push(ROTATE_CLOCK);
+                    moveList.push(ROTATE_CLOCK);
+                }
+                break;
             case KEY_HOLD:
 
                 if (curr && !prev)
