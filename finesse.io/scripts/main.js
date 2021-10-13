@@ -361,8 +361,31 @@ var playerArrSetting;
                 }
             }
         }
+        
+        function gridUnchanged(first, second, rowsFromEnd)
+        {
+            for (var y = first.length - 1; y > first.length - 2 - rowsFromEnd; y--)
+            {
+                for (var x = 0; x < first[y].length; x++)
+                {
+                    if (first[y][x] !== second[y][x])
+                        return false;
+                }
+            }
+            return true;
+        }
+        
         function shapeHasLanded(fastDown = false) {
-            
+            // store the state of the grid before adding a new piece
+            var gridBefore = [];
+            for (var y = 0; y < grid.length; y++)
+            {
+                gridBefore[y] = [];
+                for (var x = 0; x < grid[y].length; x++)
+                {
+                    gridBefore[y][x] = grid[y][x];
+                }
+            }
             usedHold = false;
             
             if (gameMode === GAME_MODE_9)
@@ -423,10 +446,14 @@ var playerArrSetting;
                 
                 moveList = [];
                 addShape(fallingShape);
-            if (fallingShapeRow <= STARTING_ROW) {
-                scoreboard.setGameOver();
-                scoreboard.setTopscore();
-            } else {
+                // store the state of the grid AFTER placing a piece
+                var gridAfter = grid.slice();
+                if (gridUnchanged(gridBefore, gridAfter, 20))
+                {
+                    scoreboard.setGameOver();
+                    scoreboard.setTopscore();
+                }
+                else {
                     removeLines();
     //                scoreboard.addLines();
                 }
@@ -534,12 +561,18 @@ var playerArrSetting;
                 }
             }
             
-            if (fallingShapeRow <= STARTING_ROW) {
-                scoreboard.setGameOver();
-                scoreboard.setTopscore();
-            } else {
-                removeLines();
-//                scoreboard.addLines();
+            if (!(retryOnFinesseFault && !correct))
+            {
+                // store the state of the grid AFTER placing a piece
+                var gridAfter = grid.slice();
+                if (gameMode === 8 && gridUnchanged(gridBefore, gridAfter, 20))
+                {
+                    scoreboard.setGameOver();
+                    scoreboard.setTopscore();
+                } else {
+                    removeLines();
+    //                scoreboard.addLines();
+                }
             }
             if (gameMode < GAME_MODE_8)
             {
