@@ -22,6 +22,7 @@ const KEY_RIGHT = 'RIGHT';
 const KEY_DOWN = 'SOFT_DROP';
 const KEY_CLOCK = 'ROTATE_C';
 const KEY_COUNTERCLOCK = 'ROTATE_CC';
+const KEY_180 = '180';
 const KEY_HOLD =  'HOLD';
 const KEY_MODE = 'MODE';
 const KEY_RESET = 'START';
@@ -46,7 +47,8 @@ var defaultKeyboardBindings = [
     ['arrowright', KEY_RIGHT],
     ['keyx', KEY_CLOCK],
     ['keyz', KEY_COUNTERCLOCK],
-    ['keyc', KEY_HOLD],
+    ['keyc', KEY_180],
+    ['space', KEY_HOLD],
     ['escape', KEY_RESET],
     ['tab', KEY_MODE]
 ];
@@ -57,7 +59,8 @@ var keyboardBindings = [
     ['arrowright', KEY_RIGHT],
     ['keyx', KEY_CLOCK],
     ['keyz', KEY_COUNTERCLOCK],
-    ['keyc', KEY_HOLD],
+    ['keyc', KEY_180],
+    ['space', KEY_HOLD],
     ['escape', KEY_RESET],
     ['tab', KEY_MODE]
 ];
@@ -68,6 +71,7 @@ var defaultControllerBindings = [
     [15, KEY_RIGHT],
     [1, KEY_CLOCK],
     [0, KEY_COUNTERCLOCK],
+    [2, KEY_180],
     [5, KEY_HOLD],
     [8, KEY_RESET],
     [9, KEY_MODE]
@@ -79,6 +83,7 @@ var controllerBindings = [
     [15, KEY_RIGHT],
     [1, KEY_CLOCK],
     [0, KEY_COUNTERCLOCK],
+    [2, KEY_180],
     [5, KEY_HOLD],
     [8, KEY_RESET],
     [9, KEY_MODE]
@@ -131,6 +136,7 @@ var gameMode = 0;
         var BORDER = -2;
         var clockwise = 1;
         var counterclockwise = -1;
+        var rotate180 = 0;
  
         var fallingShape;
         var dim = 640;
@@ -265,11 +271,15 @@ var playerArrSetting;
             var tempShape = new Shape(s.x, s.y, s.matrix, s.ordinal, s.orientation);
             if (direction === clockwise){
                rotateClockwise(tempShape);
-           } else {
+           } else if (direction === counterclockwise) {
                rotateCounterClockwise(tempShape);
+           } else if (direction === rotate180)
+           {
+               console.log("180!");
+               rotateClockwise(tempShape);
+               rotateClockwise(tempShape);
            }
-            
-            
+           
             var offsets = getOffsets(fallingShape.ordinal, fallingShape.orientation, tempShape.orientation);
             var tests = new Array(offsets.length);
             for (var i = 0; i < offsets.length; i++)
@@ -310,8 +320,12 @@ var playerArrSetting;
  
             if (direction === clockwise){
                rotateClockwise(s);
-           } else {
+           } else if (direction === counterclockwise){
                rotateCounterClockwise(s);
+           } else if (direction === rotate180)
+           {
+               rotateClockwise(s);
+               rotateClockwise(s);
            }
         }
  
@@ -1385,6 +1399,7 @@ function exportSettings()
                 KEY_RIGHT: getKeyboardInputForCode(KEY_RIGHT),
                 KEY_CLOCK: getKeyboardInputForCode(KEY_CLOCK),
                 KEY_COUNTERCLOCK: getKeyboardInputForCode(KEY_COUNTERCLOCK),
+                KEY_180: getKeyboardInputForCode(KEY_180),
                 KEY_HOLD: getKeyboardInputForCode(KEY_HOLD),
                 KEY_RESET: getKeyboardInputForCode(KEY_RESET),
                 KEY_MODE: getKeyboardInputForCode(KEY_MODE)
@@ -1397,6 +1412,7 @@ function exportSettings()
                 KEY_RIGHT: getControllerInputForCode(KEY_RIGHT),
                 KEY_CLOCK: getControllerInputForCode(KEY_CLOCK),
                 KEY_COUNTERCLOCK: getControllerInputForCode(KEY_COUNTERCLOCK),
+                KEY_180: getControllerInputForCode(KEY_180),
                 KEY_HOLD: getControllerInputForCode(KEY_HOLD),
                 KEY_RESET: getControllerInputForCode(KEY_RESET),
                 KEY_MODE: getControllerInputForCode(KEY_MODE)
@@ -1439,6 +1455,7 @@ function importSettings(settings)
         keyboardBindings.push([keybinds.KEY_RIGHT, KEY_RIGHT]);
         keyboardBindings.push([keybinds.KEY_CLOCK, KEY_CLOCK]);
         keyboardBindings.push([keybinds.KEY_COUNTERCLOCK, KEY_COUNTERCLOCK]);
+        keyboardBindings.push([keybinds.KEY_180, KEY_180]);
         keyboardBindings.push([keybinds.KEY_HOLD, KEY_HOLD]);
         keyboardBindings.push([keybinds.KEY_MODE, KEY_MODE]);
         keyboardBindings.push([keybinds.KEY_RESET, KEY_RESET]);
@@ -1455,6 +1472,7 @@ function importSettings(settings)
         controllerBindings.push([keybinds.KEY_RIGHT, KEY_RIGHT]);
         controllerBindings.push([keybinds.KEY_CLOCK, KEY_CLOCK]);
         controllerBindings.push([keybinds.KEY_COUNTERCLOCK, KEY_COUNTERCLOCK]);
+        controllerBindings.push([keybinds.KEY_180, KEY_180]);
         controllerBindings.push([keybinds.KEY_HOLD, KEY_HOLD]);
         controllerBindings.push([keybinds.KEY_MODE, KEY_MODE]);
         controllerBindings.push([keybinds.KEY_RESET, KEY_RESET]);
@@ -1511,6 +1529,7 @@ function saveSettings()
                 KEY_RIGHT: getKeyboardInputForCode(KEY_RIGHT),
                 KEY_CLOCK: getKeyboardInputForCode(KEY_CLOCK),
                 KEY_COUNTERCLOCK: getKeyboardInputForCode(KEY_COUNTERCLOCK),
+                KEY_180: getKeyboardInputForCode(KEY_180),
                 KEY_HOLD: getKeyboardInputForCode(KEY_HOLD),
                 KEY_RESET: getKeyboardInputForCode(KEY_RESET),
                 KEY_MODE: getKeyboardInputForCode(KEY_MODE)
@@ -1523,6 +1542,7 @@ function saveSettings()
                 KEY_RIGHT: getControllerInputForCode(KEY_RIGHT),
                 KEY_CLOCK: getControllerInputForCode(KEY_CLOCK),
                 KEY_COUNTERCLOCK: getControllerInputForCode(KEY_COUNTERCLOCK),
+                KEY_180: getControllerInputForCode(KEY_180),
                 KEY_HOLD: getControllerInputForCode(KEY_HOLD),
                 KEY_RESET: getControllerInputForCode(KEY_RESET),
                 KEY_MODE: getControllerInputForCode(KEY_MODE)
