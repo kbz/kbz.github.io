@@ -2,4 +2,4 @@
 
 kb_z's projects:
 
-* [finesse.io](https://kbz.github.io/finesse.io/index.html)
+* [finesse.io](https://kbz.github.io/finesse.io)
