@@ -697,10 +697,13 @@ var playerArrSetting;
         }
  
         function selectShape() {
+            fallingShape = getRandomShape();
             fallingShapeRow = STARTING_ROW;
             fallingShapeCol = STARTING_COL;
+            // work around for the O piece starting a block lower than other pieces.
+            if (fallingShape.ordinal === 4)
+                fallingShapeRow -= 1;
             ghostRow = 1;
-            fallingShape = getRandomShape();
         }
  
         function Scoreboard() {
