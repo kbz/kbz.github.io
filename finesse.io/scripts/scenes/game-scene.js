@@ -285,6 +285,10 @@ class GameScene extends Scene
 
     handleInput(code, prev, curr)
     {
+        if (!prev && curr)
+        {
+            scoreboard.addKeyPress(1)
+        }
         switch (code)
         {
             case KEY_MODE:
@@ -481,6 +485,7 @@ class GameScene extends Scene
                     }
                     moveList.push(DROP);
                     shapeHasLanded(true);
+                    scoreboard.newPiece();
                 }
                 break;
             case KEY_CLOCK:
