@@ -428,3 +428,36 @@ function isIn(as) {
         return as.includes(a);
     };
 }
+
+function getMoveString(move)
+{
+    if (move === ROTATE_CLOCK)
+    {
+        return "CLOCKWISE";
+    }
+    if (move === ROTATE_COUNTER)
+    {
+        return "COUNTERCLOCKWISE";
+    }
+    if (move === RIGHT)
+    {
+        return "RIGHT";
+    }
+    if (move === DAS_RIGHT)
+    {
+        return "DAS RIGHT";
+    }
+    if (move === LEFT)
+    {
+        return "LEFT";
+    }
+    if (move === DAS_LEFT)
+    {
+        return "DAS LEFT";
+    }
+    if (move === DROP)
+    {
+        return "HARD DROP";
+    }
+    return move;
+}
