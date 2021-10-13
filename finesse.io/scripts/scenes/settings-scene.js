@@ -17,11 +17,11 @@ limitations under the License.
 class SettingsScene extends Scene{
     
     bindsBox = {
-        x: 100, y: 25, h: 295, w: 440
+        x: 100, y: 25, h: 325, w: 440
     };
     
     keyboardBindsBox = {
-        x: 340, y: 25, h: 295, w: 100
+        x: 340, y: 25, h: 325, w: 100
     };
     
     leftKeyBindBox = {
@@ -42,44 +42,47 @@ class SettingsScene extends Scene{
     counterclockwiseKeyBindBox = {
         x: 340, y: 200, h: 30, w:200
     }; 
+    rotate180KeyBindBox = {
+        x: 340, y: 230, h: 30, w:200
+    }; 
     
     holdKeyBindBox = {
-        x: 340, y: 230, h: 30, w:200
+        x: 340, y: 260, h: 30, w:200
     };
     gameModeKeyBindBox = {
-        x: 340, y: 260, h: 30, w:200
+        x: 340, y: 290, h: 30, w:200
     }; 
     newGameKeyBindBox = {
-        x: 340, y: 290, h: 30, w:200
+        x: 340, y: 320, h: 30, w:200
     }; 
     
     controllerBindsBox  = {
-        x: 440, y: 25, h: 295, w: 100
+        x: 440, y: 25, h: 325, w: 100
     };
     
     settingsBox = {
-        x: 100, y: 330, h: 200, w: 440
+        x: 100, y: 375, h: 180, w: 440
     };
     
     dasSettingBox = {
-        x: 340, y: 350, w: 200, h:30
+        x: 340, y: 375, w: 200, h:30
     };
     arrSettingBox = {
-        x: 340, y: 380, w: 200, h:30
+        x: 340, y: 405, w: 200, h:30
     };
     sdrSettingBox = {
-        x: 340, y: 410, w: 200, h:30
+        x: 340, y: 435, w: 200, h:30
     };
     
     masterModeSettingsBox = {
-        x: 340, y: 440, w: 200, h:30
+        x: 340, y: 465, w: 200, h:30
    };
     
     retryOnFinesseSettingsBox = {
-        x: 340, y: 470, w: 200, h:30
+        x: 340, y: 495, w: 200, h:30
    };
     showGhostSettingsBox = {
-        x: 340, y: 500, w: 200, h:30
+        x: 340, y: 525, w: 200, h:30
    };
    
     returnButtonBox = {
@@ -125,9 +128,10 @@ class SettingsScene extends Scene{
         fillRect(this.hardDropKeyBindBox, "#004400");
         fillRect(this.clockwiseKeyBindBox, "#00AA00");
         fillRect(this.counterclockwiseKeyBindBox, "#004400");
-        fillRect(this.holdKeyBindBox, "#00AA00");
-        fillRect(this.gameModeKeyBindBox, "#004400");
-        fillRect(this.newGameKeyBindBox, "#00AA00");
+        fillRect(this.rotate180KeyBindBox, "#00AA00");
+        fillRect(this.holdKeyBindBox, "#004400");
+        fillRect(this.gameModeKeyBindBox, "#00AA00");
+        fillRect(this.newGameKeyBindBox, "#004400");
         
         // game settings
         fillRect(this.dasSettingBox, "#004400");
@@ -175,6 +179,9 @@ class SettingsScene extends Scene{
         g.fillText("COUNTERCLOCKWISE", this.bindsBox.x + bindOffset, this.counterclockwiseKeyBindBox.y + 20);
         g.fillText(getKeyboardInputForCode(KEY_COUNTERCLOCK), this.keyboardBindsBox.x , this.counterclockwiseKeyBindBox.y + 20);
         g.fillText(getControllerInputForCode(KEY_COUNTERCLOCK), this.controllerBindsBox.x + 25, this.counterclockwiseKeyBindBox.y + 20);
+        g.fillText("ROTATE 180", this.bindsBox.x + bindOffset, this.rotate180KeyBindBox.y + 20);
+        g.fillText(getKeyboardInputForCode(KEY_180), this.keyboardBindsBox.x , this.rotate180KeyBindBox.y + 20);
+        g.fillText(getControllerInputForCode(KEY_180), this.controllerBindsBox.x + 25, this.rotate180KeyBindBox.y + 20);
         g.fillText("HOLD", this.bindsBox.x + bindOffset, this.holdKeyBindBox.y + 20);
         g.fillText(getKeyboardInputForCode(KEY_HOLD), this.keyboardBindsBox.x , this.holdKeyBindBox.y + 20);
         g.fillText(getControllerInputForCode(KEY_HOLD), this.controllerBindsBox.x + 25, this.holdKeyBindBox.y + 20);
@@ -308,6 +315,15 @@ class SettingsScene extends Scene{
         {
            this.binding = true;
            this.bindingKey = KEY_COUNTERCLOCK;
+           if (offX > this.controllerBindsBox.x)
+               this.bindingKeyboard = false;
+           else
+               this.bindingKeyboard = true;
+        }   
+        if (isWithinBoundingBox(offX, offY, this.rotate180KeyBindBox))
+        {
+           this.binding = true;
+           this.bindingKey = KEY_180;
            if (offX > this.controllerBindsBox.x)
                this.bindingKeyboard = false;
            else
