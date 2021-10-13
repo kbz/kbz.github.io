@@ -122,7 +122,6 @@ var gameMode = 0;
         var isRightDas = false;
         const FPS = 60;
         const fpsInterval = 1000/ FPS;
-        
         var g = canvas.getContext('2d');
  
         var right = { x: 1, y: 0 };
@@ -171,6 +170,7 @@ var gameMode = 0;
         
         var mainFont = 'bold 48px monospace';
         var smallFont = 'bold 18px monospace';
+        var tinyFont = 'bold 12px monospace';
         var colors = ['#FF0000', '#00FF00', 'cyan', 'purple', 'yellow', 'orange', 'blue', 'black'];
         var gridRect = { x: 172, y: 57, w: 256, h: 507 };
         var holdRect = { x: 30, y: 47, w: 100, h: 100 };
@@ -198,7 +198,7 @@ var gameMode = 0;
         
         // position of the ghost
         var ghostRow;
- 
+        
         var currentMino = [];
         var grid = [];
         var targetGrid = [];
@@ -418,7 +418,6 @@ var playerArrSetting;
                 {               
                     if (compareMoves(moveList, targetMoves))
                     {
-                        scoreboard.addScore(1);
                         scoreboard.addCorrect(1);
                         scoreboard.addLines(1);
                         scoreboard.addTotal();
@@ -441,7 +440,6 @@ var playerArrSetting;
                         if (compareMoves(moveList, moves))
                         {
                             scoreboard.addCorrect(1);
-                            scoreboard.addScore(1);
                             scoreboard.addLines(1);
                             scoreboard.addTotal();
                         }
@@ -524,7 +522,6 @@ var playerArrSetting;
             {
                 if (correct)
                 {
-                    scoreboard.addScore(1);
                     scoreboard.addCorrect(1);
                     scoreboard.addLines(1);
                     scoreboard.addTotal();
@@ -547,7 +544,6 @@ var playerArrSetting;
                     if (compareMoves(moveList, moves))
                     {
                         scoreboard.addCorrect(1);
-                        scoreboard.addScore(1);
                         scoreboard.addLines(1);
                         scoreboard.addTotal();
                     }
@@ -755,6 +751,10 @@ var playerArrSetting;
  
         function Scoreboard() {
             this.MAXLEVEL = 9;
+            
+            var currentPieceKeyCount = 0;
+            var totalPieceKeyCount;
+            var totalPieceCount;
  
             var level = 0;
             var lines = 0;
@@ -771,7 +771,7 @@ var playerArrSetting;
             
             this.wipe = function()
             {
-                topscore = level = lines = score = total = correct = 0;
+                topscore = level = lines = score = total = correct = currentPieceKeyCount = totalPieceKeyCount = totalPieceCount = 0;
                 
             };
             
@@ -800,7 +800,7 @@ var playerArrSetting;
  
             this.setTopscore = function () {
                 if (lines > topscore) {
-                    topscore = score;
+                    topscore = lines;
                 }
             };
  
@@ -814,6 +814,16 @@ var playerArrSetting;
                     default: return 10000;
                 }
             };
+            
+            this.getKPP = function()
+            {
+                return totalPieceKeyCount / totalPieceCount;
+            };
+            
+            this.getCurrentKeyCount = function()
+            {
+                return currentPieceKeyCount;
+            };
  
             this.addScore = function (sc) {
                 score += sc;
@@ -822,7 +832,18 @@ var playerArrSetting;
             this.addLines = function (line) {
                 lines += line;
             };
- 
+            
+            this.addKeyPress = function(count){
+                currentPieceKeyCount += count;
+            };
+            
+            this.newPiece = function()
+            {
+                totalPieceCount += 1;
+                totalPieceKeyCount += currentPieceKeyCount;
+                currentPieceKeyCount= 0;
+            };
+            
             this.addCorrect = function(number) {
                 correct += number;
             };
@@ -1095,18 +1116,20 @@ var playerArrSetting;
             g.fillText( scoreboard.getTopscore(), scoreX, scoreY + 45);
             g.fillText('combo: ', scoreX, scoreY + 60);
             g.fillText(+ scoreboard.getLines(), scoreX, scoreY + 75);
-            g.fillText('score: ', scoreX, scoreY + 90);
-            g.fillText(scoreboard.getScore(), scoreX, scoreY + 105);
-            g.fillText('total pieces: ', scoreX, scoreY + 120);
-            g.fillText( scoreboard.getTotal(), scoreX, scoreY + 135);
+            g.fillText('total pieces: ', scoreX, scoreY + 90);
+            g.fillText( scoreboard.getTotal(), scoreX, scoreY + 105);
+            g.fillText('KPP: ', scoreX, scoreY + 120);
+            g.fillText(scoreboard.getKPP().toFixed(2), scoreX, scoreY + 135);
+            g.fillText('Inputs: ', scoreX, scoreY + 150);
+            g.fillText(scoreboard.getCurrentKeyCount(), scoreX, scoreY + 165);
+            
             if (scoreboard.getTotal() !== 0)
             {
-                g.fillText('Correct: ', scoreX, scoreY + 150);
-                g.fillText(scoreboard.getCorrect(), scoreX, scoreY + 165);
-                g.fillText('finesse (%): ', scoreX, scoreY + 180);
-                g.fillText(Math.floor((100*scoreboard.getCorrect() / scoreboard.getTotal())), scoreX, scoreY + 195);
+                g.fillText('Correct: ', scoreX, scoreY + 180);
+                g.fillText(scoreboard.getCorrect(), scoreX, scoreY + 195);
+                g.fillText('finesse (%): ', scoreX, scoreY + 210);
+                g.fillText((100*scoreboard.getCorrect() / scoreboard.getTotal()).toFixed(2), scoreX, scoreY + 225);
             }
-            g.fillText( scoreboard.getTotal(), scoreX, scoreY + 135);
 
             g.fillText('ARR:', settingsX, settingsY);
             if (ARR_VALUE >= 0)
@@ -1248,17 +1271,22 @@ var demoDelay = 5;
             var cy = previewCenterY ;
             // scoreboard
             g.fillStyle = textColor;
-            g.font = smallFont;
+            g.font = tinyFont;
             for (var t = 0; t < targetMoves.length; t++)
             {
                 var text = "";
                 for (var i = 0; i < targetMoves[t].length; i++)
                 {
-                    text += targetMoves[t][i] +" ";
+                    text = getMoveString(targetMoves[t][i]);
+                    g.fillText(text, cx, cy);
+                    cy += 15;   
                     
                 }
-                    g.fillText(text, cx, cy);
-                    cy += 30;   
+                cy += 30;
+                if (t < targetMoves.length - 1){
+                    g.fillText("OR", cx, cy);
+                cy += 30;
+                }
             }
         }
         function drawTarget() {
