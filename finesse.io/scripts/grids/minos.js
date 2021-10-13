@@ -225,5 +225,5 @@ getOffsets = function(index, srcOrientation, dstOrientation)
                break;
         }
     }
-    return [0,0];
+    return [[0,0]];
 };
