@@ -86,6 +86,10 @@ class GameScene extends Scene
             if (scoreboard.isGameOver()) {
                 drawStartScreen();
             } else {
+                if (gameMode === 8)
+                {
+                    drawNext();
+                }
                 drawFallingShape();
                 if (showGhost)
                     drawGhost();
@@ -554,6 +558,15 @@ class GameScene extends Scene
                     usedHold = true;
                     fallingShapeRow = STARTING_ROW;
                     fallingShapeCol = STARTING_COL;
+                    if (fallingShape.ordinal === 4)
+                    {
+                        fallingShapeRow -= 1;
+                    }
+                    if (!canSpawn(fallingShape, fallingShapeRow, fallingShapeCol, grid))
+                    {
+                        scoreboard.setGameOver();
+                        scoreboard.setTopscore();
+                    }
                     moveList = [];
                 }
                 break;
