@@ -94,6 +94,7 @@ var gameMode = 0;
         var canvas = document.querySelector('canvas');
         const globalAlpha = 1;
         const ghostAlpha = 0.25;
+        const nextAlpha = 0.3;
         var targetAlpha = 0.25;
         var targetFill = "#000000";
         var targetBorder = "#FFFFFF";
@@ -122,6 +123,7 @@ var gameMode = 0;
         var isRightDas = false;
         const FPS = 60;
         const fpsInterval = 1000/ FPS;
+
         var g = canvas.getContext('2d');
  
         var right = { x: 1, y: 0 };
@@ -198,7 +200,7 @@ var gameMode = 0;
         
         // position of the ghost
         var ghostRow;
-        
+
         var currentMino = [];
         var grid = [];
         var targetGrid = [];
@@ -747,6 +749,26 @@ var playerArrSetting;
             if (fallingShape.ordinal === 4)
                 fallingShapeRow -= 1;
             ghostRow = 1;
+            if (!canSpawn(fallingShape, fallingShapeRow, fallingShapeCol, grid))
+            {
+                scoreboard.setGameOver();
+                scoreboard.setTopscore();
+            }
+        }
+ 
+        function canSpawn(shape, row, col, matrix)
+        {
+            for (var y = 0; y < shape.matrix.length; y++)
+            {
+                for (var x = 0; x < shape.matrix[y].length; x++)
+                {
+                    if (matrix[row+y][col + x] !== EMPTY && shape.matrix[y][x] === 1)
+                    {
+                        return false;
+                    }
+                }
+            }
+            return true;
         }
  
         function Scoreboard() {
@@ -940,6 +962,49 @@ var playerArrSetting;
                 drawBagItem(allItems[i], i);
             }
         }
+        
+        function drawNext()
+        {
+            var allItems = [];
+            for (var i = 0; i < bag.length; i++)
+            {
+                allItems.push(bag[i]);
+            }
+            for (var i = 0; i < nextBag.length; i++)
+            {
+                allItems.push(nextBag[i]);
+            }
+            drawNextShape(allItems[0]);
+        }
+
+        function drawNextShape(ordinal) {
+            var y_offset = 0;
+            if (ordinal === 4)
+            {
+                y_offset = -1;
+            }
+            var item = minos[ordinal];
+            for (var y = 0; y < item.length; y++){
+                for (var x = 0; x < item[y].length; x++)
+                {
+                    if (item[y][x] === 1)
+                        drawNextSquare(ordinal, STARTING_ROW + y + y_offset, STARTING_COL + x);
+                }
+            }
+        }
+        function drawNextSquare(colorIndex, r, c) {
+            g.globalAlpha = nextAlpha;
+            var bs = blockSize;
+            //g.fillStyle = colors[colorIndex];
+            g.fillStyle = 'red';
+            g.fillRect(leftMargin + c * bs, topMargin + r * bs, bs, bs);
+ 
+            g.lineWidth = smallStroke;
+            g.strokeStyle = squareBorder;
+            g.strokeRect(leftMargin + c * bs, topMargin + r * bs, bs, bs);
+            g.globalAlpha = globalAlpha;
+        }
+
         function drawBagItem(ordinal, place)
         {
             var bs = place === 0 ? 0.8 : 0.5;
