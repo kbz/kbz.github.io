@@ -119,6 +119,7 @@ var gameMode = 0;
         var   DAS_VALUE = 12;
         const DEF_LOCK_DELAY = 12;
         const MESSAGE_DURATION = 120;
+        const FAULT_DURATION = 10;
         var isLeftDas = false;
         var isRightDas = false;
         const FPS = 60;
@@ -211,6 +212,7 @@ var gameMode = 0;
         var messages = [];
                 
         var messageTime = MESSAGE_DURATION;
+        var faultTime = 0;
         var hold;
         var usedHold = false;
         var showGhost = true;
@@ -563,6 +565,10 @@ var playerArrSetting;
             moveList = [];
             if (gameMode === 8)
             {
+                if (!correct)
+                {
+                    faultTime = FAULT_DURATION;
+                }
                 if (retryOnFinesseFault && !correct)
                 {
                     console.log("finesse fault!");
@@ -1230,6 +1236,15 @@ var playerArrSetting;
                     messages.shift();
                     messageTime = MESSAGE_DURATION;
                 }
+            }
+            
+            if (faultTime > 0)
+            {
+                g.globalAlpha = faultTime / FAULT_DURATION * 0.5;
+                faultTime--;
+                g.fillStyle = 'red';
+                g.fillRect(gridRect.x, gridRect.y , gridRect.w, gridRect.h);
+                g.globalAlpha = globalAlpha;
             }
             
             //g.strokeRect(settingsButton.x, settingsButton.y, settingsButton.w, settingsButton.h);
