@@ -402,6 +402,11 @@ compareMoves = function(src, target)
     {
         return true;
     }
+    for (var t = 0; t < src.length; t++)
+    {
+        if (src[t] === SOFT_DROP)
+            return true;
+    }
     for (var t = 0; t < target.length; t++)
     {
         var currentTarget = moveList[t];
