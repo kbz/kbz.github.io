@@ -120,6 +120,7 @@ var gameMode = 0;
         const DEF_LOCK_DELAY = 12;
         const MESSAGE_DURATION = 120;
         const FAULT_DURATION = 10;
+        const CLUTCH_TIME = 10;
         var isLeftDas = false;
         var isRightDas = false;
         const FPS = 60;
@@ -213,6 +214,7 @@ var gameMode = 0;
                 
         var messageTime = MESSAGE_DURATION;
         var faultTime = 0;
+        var clutchTime = 0;
         var hold;
         var usedHold = false;
         var showGhost = true;
@@ -582,14 +584,19 @@ var playerArrSetting;
             if (!(retryOnFinesseFault && !correct))
             {
                 // store the state of the grid AFTER placing a piece
+                
+                var lineCount = removeLines();
                 var gridAfter = grid.slice();
-                if (gameMode === 8 && gridUnchanged(gridBefore, gridAfter, 20))
+                // if a line wasn't cleared and the main grid (20x10) didn't change then do game over
+                if (gameMode === 8 && lineCount === 0 && gridUnchanged(gridBefore, gridAfter, 20))
                 {
                     scoreboard.setGameOver();
                     scoreboard.setTopscore();
-                } else {
-                    removeLines();
-    //                scoreboard.addLines();
+                }
+                else if (lineCount !== 0 && gridUnchanged(gridBefore, gridAfter, 20))
+                {
+                    console.log("Clutch!");
+                    clutchTime = CLUTCH_TIME;
                 }
             }
             if (gameMode < GAME_MODE_8)
@@ -1243,6 +1250,15 @@ var playerArrSetting;
                 g.globalAlpha = faultTime / FAULT_DURATION * 0.5;
                 faultTime--;
                 g.fillStyle = 'red';
+                g.fillRect(gridRect.x, gridRect.y , gridRect.w, gridRect.h);
+                g.globalAlpha = globalAlpha;
+            }
+            
+            if (clutchTime > 0)
+            {
+                g.globalAlpha = clutchTime / CLUTCH_TIME * 0.5;
+                clutchTime --;
+                g.fillStyle = 'green';
                 g.fillRect(gridRect.x, gridRect.y , gridRect.w, gridRect.h);
                 g.globalAlpha = globalAlpha;
             }
